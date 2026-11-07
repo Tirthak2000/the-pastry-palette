@@ -536,3 +536,12 @@ legend, .field label { font-weight: 500; font-size: 0.92rem; letter-spacing: 0.0
 .fulfil-card h3 { font-family: var(--f-display); font-weight: 600; font-size: 1.5rem; line-height: 1.1; }
 .fulfil-card p { color: var(--ink-2); }
 .near { display: grid; gap: 0.5rem; justify-items: start; margin-top: 0.3rem; }
+
+/* ───── flavour and other choices on a card ───── */
+.choice { display: grid; gap: 0.3rem; margin-top: 0.15rem; }
+.choice-label { font-size: 0.76rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); }
+.choice-label small { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.opt-btn small { font-size: 0.75rem; color: var(--accent); }
+.choice-select { width: 100%; max-width: 100%; min-height: 38px; padding: 0.3rem 0.6rem; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-size: 0.88rem; }
+.choice.missing .opts .opt-btn, .choice.missing .choice-select { border-color: var(--err); }
+.choice-hint { color: var(--err); font-size: 0.82rem; font-weight: 500; }

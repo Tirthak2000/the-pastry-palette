@@ -3,14 +3,14 @@
 Website and admin panel for **The Pastry Palette by Heli**, a home bakery in Ahmedabad
 ([@thepastry_palette](https://www.instagram.com/thepastry_palette/)).
 
-- **Shop** (`/`): menu grouped by category, size options, a cake designer, recent bakes from
+- **Shop** (`/`): menu grouped by category, sizes and flavour choices, a cake designer, recent bakes from
   Instagram, an order cart, and a checkout that sends the order to **+91 84602 82977** on WhatsApp.
   Customers choose **pickup** from the kitchen or **free delivery within 1 km**, as on the Instagram
   menu. Delivery addresses must be in Ahmedabad, and when the kitchen location is set in the admin,
   addresses further than 1 km (by the customer's shared location) are turned away with a suggestion
   to pick up instead.
 - **Admin** (`/admin`): add, edit and delete products, upload photos, change prices (one at a time or
-  in bulk), mark items sold out or hidden, reorder, manage categories, delivery rules, the cake
+  in bulk), give products flavour lists and other choices, mark items sold out or hidden, reorder, manage categories, delivery rules, the cake
   designer's flavours and sizes, shop details, and backups. Protected by a username and password.
 
 Plain HTML, CSS and JavaScript modules. No build step. Data lives in Firebase Firestore (free plan).
@@ -177,6 +177,16 @@ settings empty, and deploy. The admin panel is at `/admin`.
 - **Prices are empty**, so every item shows "Price on request". Fill them in from Admin → Products
   (type in the price boxes; each saves on its own). Sizes like "500 g / 1 kg", "Box" and "Tub" are
   starting points: change them in Edit.
+- **Flavours and other choices**: a product can have lists the customer chooses from on top of the
+  size, such as *Flavour*, *Base* or *Filling* (Admin → Products → Edit → **Flavours and other
+  choices**). Each list is either "Customer picks one" (they must choose before adding to the order)
+  or "Customer picks any" (optional, several allowed). An option can cost extra: put the amount under
+  **+ ₹** and it's added to the size's price. **Add the cake flavours** fills a list with the cake
+  designer's flavours. The choices show in the order and in the WhatsApp message, for example
+  `Salted Caramel (1 kg · Base: Chocolate)`. Set up so far: Salted Caramel (chocolate or vanilla
+  base), Cupcakes (pick any signature flavours), Unjunk Biscuits (3 flavours) and Sourdough (classic or
+  garlic & herb). Brownies and Teacakes say "ask us for this week's flavours"; add a Flavour list to
+  them when the flavours are fixed.
 - **Seasonal**: Mango Raspberry cake and Mango Tres Leches are hidden; switch "On website" on in season.
 - **Hampers** come from a festive hamper menu; keep them, hide them, or mark them sold out between festivals.
 - **Eggless**: the tiramisu and unjunk biscuits carry the "Eggless" badge. If everything is eggless,

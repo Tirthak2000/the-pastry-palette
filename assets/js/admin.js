@@ -169,6 +169,7 @@ function rowHTML(p) {
     p.bestseller ? `<span class="tag">Bestseller</span>` : "",
     p.eggless ? `<span class="tag">Eggless</span>` : "",
     p.kind === "custom" ? `<span class="tag">Opens cake designer</span>` : "",
+    ...(p.kind === "custom" ? [] : (p.choices || []).filter((g) => g?.name && g.values?.length).map((g) => `<span class="tag" title="${esc(g.values.map((v) => v.label).join(", "))}">${esc(g.name)}: ${g.values.length}</span>`)),
   ].join("");
   const id = esc(p.id);
   return `<div class="p-row${p.hidden ? " is-hidden" : ""}" data-id="${id}">
@@ -317,7 +318,9 @@ function openEditor(p) {
   $("#ed-file").value = "";
   $("#ed-photo-hint").textContent = "Square or landscape photos work best. They're resized and compressed before saving.";
   $("#ed-delete-zone").innerHTML = fresh ? "" : `<button class="btn small ghost danger" type="button" id="ed-del">Delete product</button>`;
+  ed.choices = clone(ed.choices || []);
   renderEdOpts();
+  renderEdChoices();
   renderEdPreview();
   toggleKind();
   $("#editor").showModal();
@@ -348,8 +351,76 @@ function readEdOpts() {
 }
 
 function toggleKind() {
-  $("#ed-opts-wrap").hidden = $("#ed-kind").value === "custom";
+  const custom = $("#ed-kind").value === "custom";
+  $("#ed-opts-wrap").hidden = custom;
+  $("#ed-ch-wrap").hidden = custom;
 }
+
+/* flavour and other choice lists: [{ name, type: "one" | "many", values: [{ label, extra }] }] */
+function renderEdChoices() {
+  $("#ed-ch").innerHTML = (ed.choices || []).map((g, gi) => `<div class="ch-group" data-g="${gi}">
+    <div class="ch-head">
+      <input data-f="name" value="${esc(g.name || "")}" placeholder="List name, e.g. Flavour" aria-label="Choice list ${gi + 1} name" maxlength="30">
+      <select data-f="type" aria-label="How many the customer picks from list ${gi + 1}">
+        <option value="one"${g.type === "many" ? "" : " selected"}>Customer picks one</option>
+        <option value="many"${g.type === "many" ? " selected" : ""}>Customer picks any</option>
+      </select>
+      <button class="mini danger" type="button" data-g-rm aria-label="Remove choice list ${gi + 1}">Remove list</button>
+    </div>
+    <div class="rows">${(g.values || []).map((v, vi) => `<div class="row-edit" data-v="${vi}">
+      <input class="grow" data-f="label" value="${esc(v.label || "")}" placeholder="Option, e.g. Chocolate" aria-label="List ${gi + 1}, option ${vi + 1}" maxlength="50">
+      <span class="unit">+ ₹</span><input class="num" data-f="extra" type="number" min="0" step="1" inputmode="numeric" value="${Number(v.extra) > 0 ? Number(v.extra) : ""}" placeholder="0" aria-label="Extra price for list ${gi + 1}, option ${vi + 1}">
+      <button class="mini" type="button" data-v-up ${vi === 0 ? "disabled" : ""} aria-label="Move option up">↑</button>
+      <button class="mini danger" type="button" data-v-rm aria-label="Remove option ${vi + 1}">Remove</button>
+    </div>`).join("")}</div>
+    <div class="ch-foot"><button class="btn small ghost" type="button" data-v-add>Add an option</button></div>
+  </div>`).join("");
+}
+
+function readEdChoices() {
+  return $$("#ed-ch .ch-group").map((gEl) => ({
+    name: $('[data-f="name"]', gEl).value.trim(),
+    type: $('[data-f="type"]', gEl).value === "many" ? "many" : "one",
+    values: $$(".row-edit", gEl).map((r) => {
+      const raw = $('[data-f="extra"]', r).value.trim();
+      const n = Math.max(0, Math.round(Number(raw)));
+      return { label: $('[data-f="label"]', r).value.trim(), extra: raw === "" || !n ? null : n };
+    }),
+  }));
+}
+
+$("#ed-ch").addEventListener("click", (e) => {
+  const gEl = e.target.closest(".ch-group");
+  if (!gEl) return;
+  ed.choices = readEdChoices();
+  const gi = Number(gEl.dataset.g), g = ed.choices[gi];
+  const vEl = e.target.closest(".row-edit"), vi = vEl ? Number(vEl.dataset.v) : -1;
+  let focus = null;
+  if (e.target.closest("[data-g-rm]")) { ed.choices.splice(gi, 1); focus = "#ed-ch-add"; }
+  else if (e.target.closest("[data-v-add]")) { g.values.push({ label: "", extra: null }); focus = `[data-g="${gi}"] .row-edit:last-child [data-f="label"]`; }
+  else if (e.target.closest("[data-v-rm]")) { g.values.splice(vi, 1); focus = `[data-g="${gi}"] [data-v-add]`; }
+  else if (e.target.closest("[data-v-up]") && vi > 0) { [g.values[vi - 1], g.values[vi]] = [g.values[vi], g.values[vi - 1]]; focus = `[data-g="${gi}"] [data-v="${vi - 1}"] [data-v-up]:not(:disabled), [data-g="${gi}"] [data-v="${vi - 1}"] [data-f="label"]`; }
+  else return;
+  renderEdChoices();
+  if (focus) $(focus)?.focus();
+});
+$("#ed-ch-add").addEventListener("click", () => {
+  ed.choices = readEdChoices();
+  ed.choices.push({ name: ed.choices.some((g) => g.name.toLowerCase() === "flavour") ? "" : "Flavour", type: "one", values: [{ label: "", extra: null }, { label: "", extra: null }] });
+  renderEdChoices();
+  $$("#ed-ch .ch-group").at(-1)?.querySelector(".row-edit input")?.focus();
+});
+$("#ed-ch-flav").addEventListener("click", () => {
+  ed.choices = readEdChoices();
+  const names = (S.custom?.flavours || []).map((f) => f.name).filter(Boolean);
+  if (!names.length) { toast("Add flavours in the Cake designer tab first.", "err"); return; }
+  let g = ed.choices.find((x) => x.name.toLowerCase() === "flavour");
+  if (!g) { g = { name: "Flavour", type: "one", values: [] }; ed.choices.push(g); }
+  g.values = g.values.filter((v) => v.label);
+  for (const n of names) if (!g.values.some((v) => v.label.toLowerCase() === n.toLowerCase())) g.values.push({ label: n, extra: null });
+  renderEdChoices();
+  $(`#ed-ch [data-g="${ed.choices.indexOf(g)}"] [data-f="name"]`)?.focus();
+});
 
 $("#ed-opts").addEventListener("click", (e) => {
   const r = e.target.closest(".row-edit");
@@ -438,12 +509,20 @@ $("#ed-form").addEventListener("submit", async (e) => {
   if (!$("#ed-cat").value) problems.push("Choose a category (add one in the Categories tab first).");
   if (kind !== "custom" && !options.length) problems.push("Add at least one size, such as \"500 g\" or \"Box of 6\".");
   if (readEdOpts().some((o) => !o.label && o.price !== null)) problems.push("Every price needs a size name.");
+  const choices = kind === "custom" ? [] : readEdChoices()
+    .map((g) => ({ ...g, values: g.values.filter((v) => v.label) }))
+    .filter((g) => g.name || g.values.length);
+  if (choices.some((g) => !g.name)) problems.push("Give every choice list a name, such as \"Flavour\".");
+  if (choices.some((g) => g.name && !g.values.length)) problems.push("Add at least one option to every choice list, or remove the empty list.");
+  const chNames = choices.map((g) => g.name.toLowerCase());
+  if (chNames.some((n, i) => chNames.indexOf(n) !== i)) problems.push("Two choice lists have the same name.");
+  if (choices.some((g) => { const l = g.values.map((v) => v.label.toLowerCase()); return l.some((x, i) => l.indexOf(x) !== i); })) problems.push("A choice list has the same option twice.");
   if (problems.length) { err.textContent = problems.join(" "); err.hidden = false; return; }
   err.hidden = true;
   const cat = $("#ed-cat").value;
   const p = {
     ...ed,
-    name, kind, options: kind === "custom" ? [] : options, category: cat,
+    name, kind, options: kind === "custom" ? [] : options, choices, category: cat,
     desc: $("#ed-desc").value.trim(), note: $("#ed-note").value.trim(),
     hidden: !$("#ed-show").checked, soldOut: $("#ed-sold").checked, bestseller: $("#ed-best").checked, eggless: $("#ed-egg").checked,
     art: $("#ed-art").value, tint: $("#ed-tint").value,

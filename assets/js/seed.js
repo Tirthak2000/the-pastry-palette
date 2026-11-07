@@ -14,6 +14,14 @@
 const AHEAD = "Order 24–48 hours ahead";
 const CAKE = [{ label: "500 g", price: null }, { label: "1 kg", price: null }];
 const one = (label) => [{ label, price: null }];
+// A choice list on a product: the customer picks one (type "one") or any number ("many").
+// `extra` is added to the size's price; leave it null when the flavour costs the same.
+const pickOne = (name, labels) => ({ name, type: "one", values: labels.map((label) => ({ label, extra: null })) });
+const pickAny = (name, labels) => ({ name, type: "many", values: labels.map((label) => ({ label, extra: null })) });
+const CUPCAKE_FLAVOURS = [
+  "Nutty chocolate salted caramel", "Nutella hazelnut", "Salted caramel", "Lemon curd blueberry",
+  "Chocolate mocha", "Vanilla coffee", "Raspberry pistachio", "Orange choco mocha", "Chocolate Lotus Biscoff",
+];
 
 export const DEFAULT_SETTINGS = {
   shopName: "The Pastry Palette",
@@ -106,10 +114,8 @@ export const STARTER_PRODUCTS = [
     id: "salted-caramel", category: "cakes", sort: 30,
     name: "Salted Caramel",
     desc: "Buttery salted caramel cake, on a chocolate or a vanilla base.",
-    options: [
-      { label: "Chocolate · 500 g", price: null }, { label: "Chocolate · 1 kg", price: null },
-      { label: "Vanilla · 500 g", price: null }, { label: "Vanilla · 1 kg", price: null },
-    ],
+    options: CAKE,
+    choices: [pickOne("Base", ["Chocolate", "Vanilla"])],
     art: "cake", tint: "#c98a4b", note: AHEAD,
   },
   {
@@ -249,8 +255,9 @@ export const STARTER_PRODUCTS = [
   {
     id: "cupcakes", category: "cupcakes", sort: 10,
     name: "Cupcakes",
-    desc: "Choose any flavours from our cake menu and tell us in the order notes. The price depends on the flavours.",
+    desc: "Pick the flavours you'd like in your box, from our signature cakes. The price depends on the flavours.",
     options: [{ label: "Box of 6", price: null }, { label: "Box of 12", price: null }],
+    choices: [pickAny("Flavours", CUPCAKE_FLAVOURS)],
     image: "assets/img/products/cupcakes.jpg", art: "cupcakes", tint: "#e7a3b0", note: "Minimum 6 · customisation extra",
   },
 
@@ -307,11 +314,8 @@ export const STARTER_PRODUCTS = [
     id: "unjunk-biscuits", category: "unjunk", sort: 10,
     name: "Unjunk Biscuits",
     desc: "100% whole-wheat biscuits with no maida, no refined sugar and no palm or refined oil.",
-    options: [
-      { label: "Cheese & herbs", price: null },
-      { label: "Almond pistachio", price: null },
-      { label: "Butter elaichi nankhatai", price: null },
-    ],
+    options: one("Box"),
+    choices: [pickOne("Flavour", ["Cheese & herbs", "Almond pistachio", "Butter elaichi nankhatai"])],
     image: "assets/img/gallery/unjunk-biscuits.jpg", art: "cookies", tint: "#d0a86c", eggless: true,
   },
 
@@ -320,7 +324,8 @@ export const STARTER_PRODUCTS = [
     id: "sourdough-loaf", category: "breads", sort: 10,
     name: "Sourdough Loaf",
     desc: "Slow-fermented, naturally leavened bread with an open crumb and a crackly crust.",
-    options: [{ label: "Classic", price: null }, { label: "Roasted garlic & herb (wholewheat)", price: null }],
+    options: one("Loaf"),
+    choices: [pickOne("Type", ["Classic", "Roasted garlic & herb (wholewheat)"])],
     image: "assets/img/gallery/sourdough.jpg", art: "bread", tint: "#c88a4e", note: AHEAD,
   },
   {

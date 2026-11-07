@@ -8,7 +8,7 @@ import { DEFAULT_SETTINGS, STARTER_PRODUCTS } from "./seed.js";
 import { clone } from "./util.js";
 
 export const isLive = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId);
-const DEMO_KEY = "tpp-demo-v2";
+const DEMO_KEY = "tpp-demo-v3";
 
 // Settings from the database are laid over the defaults, so fields added later always exist.
 export function mergeSettings(saved) {

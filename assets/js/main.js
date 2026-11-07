@@ -28,6 +28,55 @@ function optionFor(p, label) {
   return opts.find((o) => o.label === label) || opts[0] || null;
 }
 
+// Flavour and other choice lists on a product:
+// [{ name: "Flavour", type: "one" | "many", values: [{ label: "Nutella", extra: 50 }] }]
+const choiceLists = (p) =>
+  (p?.choices || [])
+    .map((g) => ({
+      name: String(g?.name || "").trim(),
+      type: g?.type === "many" ? "many" : "one",
+      values: (g?.values || []).filter((v) => v && String(v.label || "").trim()),
+    }))
+    .filter((g) => g.name && g.values.length);
+const picked = {}; // product id → { listName: value | [values] } while choosing on the card
+const needPick = {}; // product id → list name the customer still has to choose
+function picksFor(p) {
+  // start from what's already in the order, so the card matches the cart after a reload
+  if (!picked[p.id]) {
+    const last = [...cart.lines].reverse().find((l) => l.pid === p.id);
+    picked[p.id] = last ? JSON.parse(JSON.stringify(last.picks || {})) : {};
+    if (last && chosen[p.id] === undefined) chosen[p.id] = last.label;
+  }
+  return picked[p.id];
+}
+const pickKey = (picks) => JSON.stringify(Object.keys(picks || {}).sort().map((k) => [k, picks[k]]));
+const asList = (v) => (Array.isArray(v) ? v : v ? [v] : []);
+const missingPick = (p, picks) => choiceLists(p).find((g) => g.type === "one" && !picks?.[g.name]);
+function extrasOf(p, picks) {
+  let e = 0;
+  for (const g of choiceLists(p)) {
+    for (const v of asList(picks?.[g.name])) {
+      const x = g.values.find((y) => y.label === v);
+      if (x && Number(x.extra) > 0) e += Number(x.extra);
+    }
+  }
+  return e;
+}
+const picksText = (p, picks) =>
+  choiceLists(p).map((g) => (asList(picks?.[g.name]).length ? `${g.name}: ${asList(picks[g.name]).join(", ")}` : "")).filter(Boolean);
+function picksValid(p, picks) {
+  const lists = choiceLists(p);
+  if (missingPick(p, picks)) return false;
+  return Object.keys(picks || {}).every((k) => {
+    const g = lists.find((x) => x.name === k);
+    return g && asList(picks[k]).every((v) => g.values.some((y) => y.label === v));
+  });
+}
+function linePrice(p, label, picks) {
+  const o = optionFor(p, label);
+  return hasPrice(o?.price) ? Number(o.price) + extrasOf(p, picks) : null;
+}
+
 let toastTimer;
 function toast(msg, action, fn) {
   const t = $("#toast");
@@ -53,25 +102,26 @@ function saveCart() {
 function pruneCart() {
   cart.lines = cart.lines.filter((l) => {
     const p = byId.get(l.pid);
-    return p && !p.hidden && !p.soldOut && p.kind !== "custom" && optionFor(p, l.label);
+    return p && !p.hidden && !p.soldOut && p.kind !== "custom" && optionFor(p, l.label) && picksValid(p, l.picks || {});
   });
 }
-const qtyOf = (pid, label) => cart.lines.find((l) => l.pid === pid && l.label === label)?.qty || 0;
+const sameLine = (l, pid, label, picks) => l.pid === pid && l.label === label && pickKey(l.picks) === pickKey(picks);
+const qtyOf = (pid, label, picks) => cart.lines.find((l) => sameLine(l, pid, label, picks))?.qty || 0;
 const itemCount = () => cart.lines.reduce((a, l) => a + l.qty, 0) + cart.custom.length;
 
-function setQty(pid, label, qty) {
-  const i = cart.lines.findIndex((l) => l.pid === pid && l.label === label);
+function setQty(pid, label, picks, qty) {
+  const i = cart.lines.findIndex((l) => sameLine(l, pid, label, picks));
   if (qty <= 0) { if (i >= 0) cart.lines.splice(i, 1); }
   else if (i >= 0) cart.lines[i].qty = Math.min(qty, 50);
-  else cart.lines.push({ pid, label, qty: 1 });
+  else cart.lines.push({ pid, label, picks: JSON.parse(JSON.stringify(picks || {})), qty: 1 });
   saveCart();
 }
 
 function priced() {
   let sub = 0, unpriced = 0;
   for (const l of cart.lines) {
-    const o = optionFor(byId.get(l.pid), l.label);
-    if (hasPrice(o?.price)) sub += Number(o.price) * l.qty; else unpriced++;
+    const each = linePrice(byId.get(l.pid), l.label, l.picks);
+    if (each !== null) sub += each * l.qty; else unpriced++;
   }
   unpriced += cart.custom.length;
   return { sub, unpriced };
@@ -137,6 +187,26 @@ function minPerKg() {
   return prices.length ? Math.min(...prices) : 0;
 }
 
+function choicesHTML(p) {
+  const picks = picksFor(p);
+  return choiceLists(p).map((g, gi) => {
+    const sel = asList(picks[g.name]);
+    const tag = (v) => `${esc(v.label)}${Number(v.extra) > 0 ? ` <small>+${inr(v.extra)}</small>` : ""}`;
+    let ctl;
+    if (g.type === "one" && g.values.length > 6) {
+      ctl = `<select class="choice-select" data-choice-select="${gi}" aria-label="${esc(g.name)} for ${esc(p.name)}"><option value="">Choose ${esc(g.name.toLowerCase())}</option>${g.values.map((v) => `<option value="${esc(v.label)}"${sel.includes(v.label) ? " selected" : ""}>${esc(v.label)}${Number(v.extra) > 0 ? ` (+${inr(v.extra)})` : ""}</option>`).join("")}</select>`;
+    } else {
+      const role = g.type === "many" ? "checkbox" : "radio";
+      ctl = `<div class="opts" role="${g.type === "many" ? "group" : "radiogroup"}" aria-label="${esc(g.name)} for ${esc(p.name)}">${g.values.map((v) => `<button type="button" class="opt-btn" role="${role}" aria-checked="${sel.includes(v.label)}" data-choice="${gi}" data-val="${esc(v.label)}">${tag(v)}</button>`).join("")}</div>`;
+    }
+    const missing = needPick[p.id] === g.name;
+    return `<div class="choice${missing ? " missing" : ""}" data-group="${gi}">
+      <p class="choice-label">${esc(g.name)}${g.type === "many" ? ` <small>pick any</small>` : ""}</p>${ctl}
+      ${missing ? `<p class="choice-hint" role="alert">Choose a ${esc(g.name.toLowerCase())} first.</p>` : ""}
+    </div>`;
+  }).join("");
+}
+
 function cardControls(p) {
   if (p.kind === "custom") {
     const m = minPerKg();
@@ -144,22 +214,24 @@ function cardControls(p) {
   }
   const opts = options(p);
   if (!opts.length) return `<div class="card-foot"><span class="price"><small>Ask us for the price</small></span></div>`;
+  const picks = picksFor(p);
   const cur = optionFor(p, chosen[p.id]);
   const optHTML = opts.length > 1
     ? `<div class="opts" role="radiogroup" aria-label="Size for ${esc(p.name)}">${opts.map((o) => `<button type="button" class="opt-btn" role="radio" aria-checked="${o.label === cur.label}" data-opt="${esc(o.label)}">${esc(o.label)}</button>`).join("")}</div>`
     : "";
-  const priceHTML = hasPrice(cur.price) ? inr(cur.price) : `<small>Price on request</small>`;
+  const each = linePrice(p, cur.label, picks);
+  const priceHTML = each !== null ? inr(each) : `<small>Price on request</small>`;
   const single = opts.length === 1 ? ` <small>· ${esc(cur.label)}</small>` : "";
   let action = "";
   if (p.soldOut) action = `<span class="fine">Sold out for now</span>`;
   else if (!ordering()) action = "";
   else {
-    const q = qtyOf(p.id, cur.label);
+    const q = missingPick(p, picks) ? 0 : qtyOf(p.id, cur.label, picks);
     action = q
       ? `<div class="stepper" role="group" aria-label="Quantity of ${esc(p.name)}, ${esc(cur.label)}"><button type="button" data-dec aria-label="One fewer">−</button><output aria-live="polite">${q}</output><button type="button" data-inc aria-label="One more">+</button></div>`
       : `<button type="button" class="btn primary add-btn" data-add>Add</button>`;
   }
-  return `${optHTML}<div class="card-foot"><span class="price">${priceHTML}${single}</span>${action}</div>`;
+  return `${optHTML}${choicesHTML(p)}<div class="card-foot"><span class="price">${priceHTML}${single}</span>${action}</div>`;
 }
 
 function cardHTML(p) {
@@ -178,7 +250,7 @@ function refreshCard(pid, focusSel) {
   const card = $(`.card[data-pid="${CSS.escape(pid)}"]`);
   if (!card) return;
   card.querySelector(".controls").innerHTML = cardControls(byId.get(pid));
-  if (focusSel) (card.querySelector(focusSel) || card.querySelector("[data-add],[data-inc],.opt-btn"))?.focus();
+  if (focusSel) (card.querySelector(focusSel) || card.querySelector("[data-add],[data-inc],.opt-btn,select"))?.focus();
 }
 
 function groups() {
@@ -236,19 +308,55 @@ function onMenuClick(e) {
   if (!p) return;
   const opt = e.target.closest("[data-opt]");
   if (opt) { chosen[p.id] = opt.dataset.opt; refreshCard(p.id, `[data-opt="${CSS.escape(opt.dataset.opt)}"]`); return; }
+  const ch = e.target.closest("[data-choice]");
+  if (ch) {
+    const g = choiceLists(p)[Number(ch.dataset.choice)];
+    if (!g) return;
+    const picks = picksFor(p), v = ch.dataset.val;
+    if (g.type === "many") {
+      const cur = asList(picks[g.name]);
+      picks[g.name] = cur.includes(v) ? cur.filter((x) => x !== v) : [...cur, v];
+      if (!picks[g.name].length) delete picks[g.name];
+    } else picks[g.name] = v;
+    if (needPick[p.id] === g.name) delete needPick[p.id];
+    refreshCard(p.id, `[data-choice="${ch.dataset.choice}"][data-val="${CSS.escape(v)}"]`);
+    return;
+  }
   const cur = optionFor(p, chosen[p.id]);
   if (!cur) return;
+  const picks = picksFor(p);
+  const label = () => [cur.label, ...picksText(p, picks)].filter((x, i) => i > 0 || options(p).length > 1).join(" · ");
   if (e.target.closest("[data-add]")) {
-    setQty(p.id, cur.label, 1);
+    const miss = missingPick(p, picks);
+    if (miss) {
+      needPick[p.id] = miss.name;
+      const gi = choiceLists(p).findIndex((g) => g.name === miss.name);
+      refreshCard(p.id, `[data-group="${gi}"] .opt-btn, [data-group="${gi}"] select`);
+      return;
+    }
+    setQty(p.id, cur.label, picks, 1);
     refreshCard(p.id, "[data-inc]");
-    toast(`Added ${p.name}${options(p).length > 1 ? ` (${cur.label})` : ""}`, "View order", () => openSheet("cart"));
+    const l = label();
+    toast(`Added ${p.name}${l ? ` (${l})` : ""}`, "View order", () => openSheet("cart"));
   } else if (e.target.closest("[data-inc]")) {
-    setQty(p.id, cur.label, qtyOf(p.id, cur.label) + 1);
+    setQty(p.id, cur.label, picks, qtyOf(p.id, cur.label, picks) + 1);
     refreshCard(p.id, "[data-inc]");
   } else if (e.target.closest("[data-dec]")) {
-    setQty(p.id, cur.label, qtyOf(p.id, cur.label) - 1);
-    refreshCard(p.id, qtyOf(p.id, cur.label) ? "[data-dec]" : "[data-add]");
+    setQty(p.id, cur.label, picks, qtyOf(p.id, cur.label, picks) - 1);
+    refreshCard(p.id, qtyOf(p.id, cur.label, picks) ? "[data-dec]" : "[data-add]");
   }
+}
+
+function onMenuChange(e) {
+  const sel = e.target.closest("[data-choice-select]");
+  if (!sel) return;
+  const p = byId.get(sel.closest(".card")?.dataset.pid);
+  const g = choiceLists(p)[Number(sel.dataset.choiceSelect)];
+  if (!p || !g) return;
+  const picks = picksFor(p);
+  if (sel.value) picks[g.name] = sel.value; else delete picks[g.name];
+  if (needPick[p.id] === g.name) delete needPick[p.id];
+  refreshCard(p.id, `[data-choice-select="${sel.dataset.choiceSelect}"]`);
 }
 
 // A product photo that fails to load is swapped for its illustration.
@@ -436,15 +544,16 @@ function renderCart() {
     box.innerHTML = `<div class="cart-empty"><strong>Your order is empty</strong><p>Add cakes, cupcakes and bakes from the menu, or design a custom cake.</p><button class="btn primary" type="button" data-browse>Browse the menu</button></div>`;
   } else {
     let html = "";
-    for (const l of cart.lines) {
-      const p = byId.get(l.pid), o = optionFor(p, l.label);
-      html += `<div class="line" data-pid="${esc(l.pid)}" data-label="${esc(l.label)}">
+    cart.lines.forEach((l, i) => {
+      const p = byId.get(l.pid), o = optionFor(p, l.label), each = linePrice(p, l.label, l.picks);
+      const detail = [o.label, ...picksText(p, l.picks)].join(" · ");
+      html += `<div class="line" data-i="${i}" data-pid="${esc(l.pid)}">
         ${lineThumb(p)}
-        <div><h4>${esc(p.name)}</h4><p>${esc(o.label)}${hasPrice(o.price) ? ` · ${inr(o.price)} each` : ""}</p></div>
-        <div class="line-right"><span class="price">${hasPrice(o.price) ? inr(o.price * l.qty) : "On request"}</span>
+        <div><h4>${esc(p.name)}</h4><p>${esc(detail)}${each !== null ? ` · ${inr(each)} each` : ""}</p></div>
+        <div class="line-right"><span class="price">${each !== null ? inr(each * l.qty) : "On request"}</span>
           <div class="stepper"><button type="button" data-ldec aria-label="One fewer">−</button><output>${l.qty}</output><button type="button" data-linc aria-label="One more">+</button></div></div>
       </div>`;
-    }
+    });
     for (const c of cart.custom) {
       const detail = [c.flavour, c.size, c.occasion].filter(Boolean).join(" · ");
       html += `<div class="line" data-cid="${esc(c.cid)}">
@@ -488,14 +597,16 @@ function onCartClick(e) {
     cart.custom = cart.custom.filter((c) => c.cid !== line.dataset.cid);
     saveCart(); renderCart(); return;
   }
-  const { pid, label } = line.dataset;
-  if (!pid) return;
-  if (e.target.closest("[data-linc]")) setQty(pid, label, qtyOf(pid, label) + 1);
-  else if (e.target.closest("[data-ldec]")) setQty(pid, label, qtyOf(pid, label) - 1);
+  const i = Number(line.dataset.i), l = cart.lines[i];
+  if (!l) return;
+  const inc = Boolean(e.target.closest("[data-linc]"));
+  if (inc) setQty(l.pid, l.label, l.picks, l.qty + 1);
+  else if (e.target.closest("[data-ldec]")) setQty(l.pid, l.label, l.picks, l.qty - 1);
   else return;
+  const still = cart.lines.includes(l);
   renderCart();
-  refreshCard(pid);
-  const again = $(`#view-cart .line[data-pid="${CSS.escape(pid)}"][data-label="${CSS.escape(label)}"] ${e.target.closest("[data-linc]") ? "[data-linc]" : "[data-ldec]"}`);
+  refreshCard(l.pid);
+  const again = still && $(`#view-cart .line[data-i="${cart.lines.indexOf(l)}"] ${inc ? "[data-linc]" : "[data-ldec]"}`);
   (again || $("#sheet-close")).focus();
 }
 
@@ -625,9 +736,9 @@ function orderText(v, m = currentMethod(), km = null) {
   const L = [`*New order · ${S.shopName || "The Pastry Palette"}*`, ""];
   let i = 1;
   for (const l of cart.lines) {
-    const p = byId.get(l.pid), o = optionFor(p, l.label);
-    const size = o.label ? ` (${o.label})` : "";
-    L.push(`${i++}. ${p.name}${size} × ${l.qty} — ${hasPrice(o.price) ? inr(o.price * l.qty) : "price on request"}`);
+    const p = byId.get(l.pid), o = optionFor(p, l.label), each = linePrice(p, l.label, l.picks);
+    const detail = [o.label, ...picksText(p, l.picks)].filter(Boolean).join(" · ");
+    L.push(`${i++}. ${p.name}${detail ? ` (${detail})` : ""} × ${l.qty} — ${each !== null ? inr(each * l.qty) : "price on request"}`);
   }
   for (const c of cart.custom) {
     L.push(`${i++}. Custom cake — ${[c.occasion, c.flavour, c.size].filter(Boolean).join(", ")}`);
@@ -783,7 +894,7 @@ async function start() {
   // Demo mode: changes saved in /admin (another tab) show up here straight away.
   if (!isLive) {
     window.addEventListener("storage", async (e) => {
-      if (e.key !== "tpp-demo-v2") return;
+      if (e.key !== "tpp-demo-v3") return;
       demoForget();
       const data = await loadShop();
       S = data.settings; P = data.products;
@@ -793,6 +904,7 @@ async function start() {
 }
 
 $("#menu-body").addEventListener("click", onMenuClick);
+$("#menu-body").addEventListener("change", onMenuChange);
 $("#builder").addEventListener("click", onBuilderClick);
 $("#builder").addEventListener("submit", addCustom);
 $("#b-message").addEventListener("input", () => updateCake());

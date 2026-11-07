@@ -112,6 +112,20 @@ code { font: 0.9em ui-monospace, "SFMono-Regular", Menlo, monospace; background:
 .row-edit .num { width: 7.5rem; }
 .row-edit input[type="color"] { width: 46px; padding: 3px; }
 .row-edit .unit { font-size: 0.85rem; color: var(--ink-2); }
+.row-edit select, .ch-head select { min-height: 42px; padding: 0.4rem 0.6rem; border-radius: 10px; border: 1.5px solid var(--line); background: var(--bg); min-width: 0; }
+
+/* flavour and other choice lists in the product editor */
+#ed-ch-wrap { display: grid; gap: 0.6rem; }
+#ed-ch-wrap > .hint { margin-top: -0.3rem; }
+.ch-groups { display: grid; gap: 0.7rem; }
+.ch-groups:empty { display: none; }
+.ch-group { display: grid; gap: 0.55rem; padding: 0.75rem; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); }
+.ch-head { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; }
+.ch-head input { flex: 1 1 150px; min-height: 42px; padding: 0.4rem 0.7rem; border-radius: 10px; border: 1.5px solid var(--line); background: var(--bg); min-width: 0; font-weight: 600; }
+.ch-head select { flex: 0 1 auto; }
+.ch-head input:focus, .ch-head select:focus, .row-edit select:focus { outline: none; border-color: var(--ink); }
+.ch-group .row-edit .num { width: 6.5rem; }
+.ch-foot { display: flex; flex-wrap: wrap; gap: 0.45rem; }
 
 .c-list { display: grid; gap: 0.5rem; }
 .c-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; padding: 0.6rem; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); }
