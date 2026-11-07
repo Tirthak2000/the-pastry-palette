@@ -4,6 +4,8 @@
 // everything is edited from /admin and this file is no longer used for content.
 //
 // PRICES BELOW ARE PLACEHOLDERS. Set the real ones in the admin panel.
+// Photos: assets/img/gallery/* are from @thepastry_palette on Instagram; assets/img/products/*
+// are free Unsplash stand-ins (see README) to replace with real photos from the admin panel.
 
 export const DEFAULT_SETTINGS = {
   shopName: "The Pastry Palette",
@@ -19,7 +21,7 @@ export const DEFAULT_SETTINGS = {
   categories: [
     { id: "cakes", name: "Cakes" },
     { id: "cheesecakes", name: "Cheesecakes" },
-    { id: "cupcakes", name: "Cupcakes" },
+    { id: "cupcakes", image: "assets/img/products/cupcakes.jpg", name: "Cupcakes" },
     { id: "desserts", name: "Tiramisu & desserts" },
     { id: "cookies", name: "Cookies" },
     { id: "breads", name: "Breads & pav" },
@@ -67,48 +69,48 @@ export const DEFAULT_SETTINGS = {
 
 export const STARTER_PRODUCTS = [
   {
-    id: "lotus-biscoff-cake", category: "cakes", sort: 10,
+    id: "lotus-biscoff-cake", image: "assets/img/gallery/lotus-biscoff.jpg", category: "cakes", sort: 10,
     name: "Lotus Biscoff Chocolate Cake",
     desc: "Chocolate sponge layered with Biscoff spread and crumble, finished with a caramel drip.",
     options: [{ label: "500 g", price: 850 }, { label: "1 kg", price: 1600 }],
     art: "cake", tint: "#b9773f", bestseller: true, note: "Order 1 day ahead",
   },
   {
-    id: "whipped-caramel-cake", category: "cakes", sort: 20,
+    id: "whipped-caramel-cake", image: "assets/img/products/whipped-caramel-cake.jpg", category: "cakes", sort: 20,
     name: "Whipped Caramel Chocolate Cake",
     desc: "The viral London cake: soft chocolate sponge under clouds of whipped caramel cream.",
     options: [{ label: "500 g", price: 900 }, { label: "1 kg", price: 1700 }],
     art: "cake", tint: "#cf9a62", top: "#4e2b1f", bestseller: true, note: "Order 1 day ahead",
   },
   {
-    id: "lemon-blueberry-cake", category: "cakes", sort: 30,
+    id: "lemon-blueberry-cake", image: "assets/img/gallery/lemon-blueberry.jpg", category: "cakes", sort: 30,
     name: "Lemon Blueberry Buttercream Cake",
     desc: "Zesty lemon sponge with blueberry compote and silky buttercream.",
     options: [{ label: "500 g", price: 850 }, { label: "1 kg", price: 1600 }],
     art: "cake", tint: "#efe09a", top: "#4b5a9b", note: "Order 1 day ahead",
   },
   {
-    id: "chocolate-truffle-cake", category: "cakes", sort: 40,
+    id: "chocolate-truffle-cake", image: "assets/img/products/chocolate-truffle-cake.jpg", category: "cakes", sort: 40,
     name: "Chocolate Truffle Cake",
     desc: "Moist chocolate sponge with a rich dark-chocolate ganache.",
     options: [{ label: "500 g", price: 700 }, { label: "1 kg", price: 1300 }],
     art: "cake", tint: "#4e2b1f", note: "Order 1 day ahead",
   },
   {
-    id: "custom-theme-cake", category: "cakes", sort: 50, kind: "custom",
+    id: "custom-theme-cake", image: "assets/img/gallery/rainbow-4.jpg", category: "cakes", sort: 50, kind: "custom",
     name: "Custom Theme Cake",
     desc: "Birthdays, kids' themes, florals and toppers, designed with you. Pick a flavour, size and theme in the cake designer.",
     options: [], art: "cake", tint: "#f3d9d5", top: "#e2b65b", note: "Order 2–3 days ahead",
   },
   {
-    id: "blueberry-cheesecake", category: "cheesecakes", sort: 10,
+    id: "blueberry-cheesecake", image: "assets/img/products/blueberry-cheesecake.jpg", category: "cheesecakes", sort: 10,
     name: "Blueberry Cheesecake",
     desc: "Creamy baked cheesecake on a buttery biscuit base, topped with blueberry compote.",
     options: [{ label: "500 g", price: 950 }, { label: "1 kg", price: 1800 }],
     art: "cheesecake", tint: "#4f4e8f", note: "Order 1 day ahead",
   },
   {
-    id: "biscoff-cheesecake", category: "cheesecakes", sort: 20,
+    id: "biscoff-cheesecake", image: "assets/img/products/biscoff-cheesecake.jpg", category: "cheesecakes", sort: 20,
     name: "Biscoff Cheesecake",
     desc: "Biscoff-swirled cheesecake on a crunchy Lotus biscuit base.",
     options: [{ label: "500 g", price: 950 }, { label: "1 kg", price: 1800 }],
@@ -122,35 +124,35 @@ export const STARTER_PRODUCTS = [
     art: "cupcakes", tint: "#e7a3b0",
   },
   {
-    id: "eggless-tiramisu", category: "desserts", sort: 10,
+    id: "eggless-tiramisu", image: "assets/img/gallery/tiramisu.jpg", category: "desserts", sort: 10,
     name: "Real Eggless Tiramisu",
     desc: "Homemade savoiardi soaked in moka-pot coffee, layered with mascarpone cream and dusted with cocoa.",
     options: [{ label: "Jar", price: 250 }, { label: "Tray (serves 4–5)", price: 899 }],
     art: "tiramisu", tint: "#6b4330", eggless: true, bestseller: true,
   },
   {
-    id: "unjunk-cookies", category: "cookies", sort: 10,
+    id: "unjunk-cookies", image: "assets/img/products/cookies.jpg", category: "cookies", sort: 10,
     name: "Unjunk Cookies",
     desc: "Wholesome cookies made without the junk. Ask us for this week's flavours.",
     options: [{ label: "250 g box", price: 320 }],
     art: "cookies", tint: "#c98d52",
   },
   {
-    id: "sourdough-loaf", category: "breads", sort: 10,
+    id: "sourdough-loaf", image: "assets/img/products/sourdough.jpg", category: "breads", sort: 10,
     name: "Sourdough Loaf",
     desc: "Naturally leavened bread with a slow ferment, an open crumb and a crackly crust.",
     options: [{ label: "Loaf", price: 350 }],
     art: "bread", tint: "#c88a4e", note: "Baked to order. Order 2 days ahead",
   },
   {
-    id: "ladi-pav", category: "breads", sort: 20,
+    id: "ladi-pav", image: "assets/img/gallery/ladi-pav.jpg", category: "breads", sort: 20,
     name: "Fresh Ladi Pav",
     desc: "Soft, pull-apart pav, baked fresh for your pav bhaji or vada pav.",
     options: [{ label: "6 pav", price: 70 }, { label: "12 pav", price: 130 }],
     art: "pav", tint: "#d99a4e",
   },
   {
-    id: "celebration-hamper", category: "hampers", sort: 10,
+    id: "celebration-hamper", image: "assets/img/products/hamper.jpg", category: "hampers", sort: 10,
     name: "Celebration Hamper",
     desc: "A gift box of jar cakes, cookies and treats, put together for your occasion.",
     options: [{ label: "Classic", price: 999 }, { label: "Grand", price: 1799 }],

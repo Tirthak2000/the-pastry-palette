@@ -20,8 +20,9 @@ export const firebaseConfig = {
 // ─────────────────────────────────────────────────────────────────────────────
 // 2) ADMIN LOGIN
 // The shop has no email address, so the admin page asks for a username.
-// Typing "heli" signs in as heli@<adminEmailDomain>. Create that user in
-// Firebase → Authentication → Users. The address never receives any mail.
+// A username such as "pp-7f3a9c2e" signs in as pp-7f3a9c2e@<adminEmailDomain>.
+// Create that user in Firebase → Authentication → Users (README, step 5).
+// The address never receives any mail; it only works as a login name.
 // ─────────────────────────────────────────────────────────────────────────────
 export const adminEmailDomain = "thepastrypalette.app";
 

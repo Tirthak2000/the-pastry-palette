@@ -1,7 +1,7 @@
 // The Pastry Palette — shop page: menu, cake designer, order cart and WhatsApp checkout.
 
 import { loadShop, isLive, demoForget } from "./data.js";
-import { artSVG, paletteSVG, cakeSVG, TIER_TOPS, CAKE_VIEWS } from "./art.js";
+import { artSVG, cakeSVG, TIER_TOPS, CAKE_VIEWS } from "./art.js";
 import { esc, inr, hasPrice, shade, luminance, store, pincodeStatus, isoDate, addDays, niceDate, debounce, slug } from "./util.js";
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -101,7 +101,7 @@ function updateCartUI() {
 /* ───────────── menu ───────────── */
 function media(p) {
   const fallback = artSVG(p.art, p.tint, p.id, p.top);
-  return p.image ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" data-pid="${esc(p.id)}">` : fallback;
+  return p.image ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" decoding="async" width="400" height="500" data-pid="${esc(p.id)}">` : fallback;
 }
 
 function badges(p) {
@@ -192,10 +192,17 @@ function watchChips() {
   chipObserver = new IntersectionObserver((entries) => {
     const hit = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
     if (!hit) return;
-    $$(".chip").forEach((c) => {
+    // Only the chip strip scrolls sideways. Never call scrollIntoView here: it also scrolls the
+    // page and cancels the visitor's own scrolling, which made the page feel stuck.
+    const bar = $("#chips");
+    $$(".chip", bar).forEach((c) => {
       const on = c.getAttribute("href") === "#" + hit.target.id;
+      if (c.classList.contains("on") === on) return;
       c.classList.toggle("on", on);
-      if (on) c.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
+      if (on) {
+        const left = c.offsetLeft - (bar.clientWidth - c.offsetWidth) / 2;
+        bar.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
+      }
     });
   }, { rootMargin: "-30% 0px -60% 0px" });
   $$(".cat").forEach((s) => chipObserver.observe(s));
@@ -230,36 +237,6 @@ document.addEventListener("error", (e) => {
   const p = byId.get(img.dataset.pid);
   if (p) img.outerHTML = artSVG(p.art, p.tint, p.id, p.top);
 }, true);
-
-/* ───────────── hero palette ───────────── */
-function renderPalette() {
-  const fl = S.custom?.flavours || [];
-  const box = $("#palette");
-  box.innerHTML = paletteSVG(fl);
-  const cap = $("#palette-cap");
-  const rest = S.custom?.enabled === false ? "Some of our favourite flavours" : "Tap a colour to start a cake in that flavour";
-  cap.textContent = rest;
-  const say = (i) => {
-    const f = fl[i];
-    if (!f) return;
-    cap.textContent = `${f.name}${Number(f.perKg) > 0 ? ` · from ${inr(f.perKg)}/kg` : ""}`;
-  };
-  const pick = (i) => {
-    if (S.custom?.enabled === false) { location.hash = "#menu"; return; }
-    B.fl = i;
-    renderBuilder();
-    $("#custom").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
-  };
-  $$(".dollop", box).forEach((g) => {
-    const i = Number(g.dataset.i);
-    g.addEventListener("pointerenter", () => say(i));
-    g.addEventListener("focus", () => say(i));
-    g.addEventListener("pointerleave", () => (cap.textContent = rest));
-    g.addEventListener("blur", () => (cap.textContent = rest));
-    g.addEventListener("click", () => pick(i));
-    g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(i); } });
-  });
-}
 
 /* ───────────── cake designer ───────────── */
 const B = { occ: 0, fl: 1, sz: 1 };
@@ -385,8 +362,8 @@ function renderDeliveryFacts() {
   if (Number(d.minOrder) > 0) facts.push(`<b>Minimum order ${inr(d.minOrder)}.</b>`);
   facts.push(`<b>Ahmedabad only.</b> ${esc(d.note || "We deliver within Ahmedabad city.")} All 380xxx pincodes and many 382xxx areas are covered.`);
   $("#delivery-facts").innerHTML = facts.map((f) => `<li><span>${f}</span></li>`).join("");
-  $("#fact-lead").textContent = lead > 0 ? `Order ${lead === 1 ? "a day" : lead + " days"} ahead` : "Same-day when we have room";
-  $("#fact-egg").textContent = S.allEggless ? "100% eggless" : "Confirmed on WhatsApp";
+  $("#fact-lead span").textContent = lead > 0 ? `Order ${lead === 1 ? "a day" : lead + " days"} ahead` : "Same-day when we have room";
+  $("#fact-egg span").textContent = S.allEggless ? "100% eggless" : "Confirmed on WhatsApp";
 }
 
 function onPinCheck(e) {
@@ -404,7 +381,7 @@ function onPinCheck(e) {
 let view = "cart";
 
 function lineThumb(p) {
-  return `<div class="line-thumb">${p.image ? `<img src="${esc(p.image)}" alt="" data-pid="${esc(p.id)}">` : artSVG(p.art, p.tint, p.id, p.top)}</div>`;
+  return `<div class="line-thumb">${p.image ? `<img src="${esc(p.image)}" alt="" decoding="async" data-pid="${esc(p.id)}">` : artSVG(p.art, p.tint, p.id, p.top)}</div>`;
 }
 
 function renderCart() {
@@ -693,7 +670,6 @@ function renderAll() {
   byId = new Map(P.map((p) => [p.id, p]));
   pruneCart();
   applySettings();
-  renderPalette();
   renderMenu();
   renderBuilder();
   renderDeliveryFacts();

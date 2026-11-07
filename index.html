@@ -6,16 +6,16 @@
 <title>The Pastry Palette</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="The Pastry Palette by Heli: customised cakes, cupcakes, cheesecakes, eggless tiramisu, sourdough and more, baked to order and delivered across Ahmedabad. Order on WhatsApp.">
-<meta name="theme-color" content="#fff7f2">
+<meta name="theme-color" content="#fbf7ef">
 <meta property="og:type" content="website">
-<meta property="og:title" content="The Pastry Palette · Cakes & bakes in Ahmedabad">
+<meta property="og:title" content="The Pastry Palette by Heli · Cakes & bakes in Ahmedabad">
 <meta property="og:description" content="Customised cakes, cupcakes, cheesecakes and desserts, baked to order and delivered across Ahmedabad. Order on WhatsApp.">
 <meta property="og:image" content="assets/img/og-image.jpg">
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Vadodara:wght@400;500;600;700&family=Kalam:wght@400;700&family=Shrikhand&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&family=Pinyon+Script&display=swap">
 <link rel="stylesheet" href="assets/css/style.css">
 <script type="module" src="assets/js/main.js"></script>
 </head>
@@ -25,17 +25,18 @@
 
 <header class="site-head">
   <div class="wrap head-row">
-    <a class="brand" href="#top" aria-label="The Pastry Palette, back to top">
-      <svg class="brand-mark" viewBox="0 0 64 52" aria-hidden="true"><path d="M18 5C34-2 56 2 61 17c4 12-2 25-15 30-12 4-27 4-34-2-3-3-2-7 2-8 5-2 6-6 2-8-4-2-8 2-12 0C-3 24 0 11 18 5Zm-4 17a4 4 0 1 0 8 0a4 4 0 1 0-8 0Z" fill="var(--wood)" fill-rule="evenodd"/><circle cx="31" cy="12" r="5.5" fill="#b9773f"/><circle cx="46" cy="16" r="5.5" fill="var(--accent)"/><circle cx="50" cy="31" r="5.5" fill="#aebf7d"/><circle cx="37" cy="39" r="5.5" fill="#efe09a"/></svg>
-      <span class="brand-text"><small>the</small><b>Pastry Palette</b><i>by Heli</i></span>
+    <a class="brand" href="#top" aria-label="The Pastry Palette by Heli, back to top">
+      <img class="brand-logo" src="assets/img/logo.png" alt="" width="50" height="50">
+      <span class="brand-text"><b>The Pastry Palette</b><i>by Heli</i></span>
     </a>
     <nav class="head-nav" aria-label="Sections">
       <a href="#menu">Menu</a>
       <a href="#custom">Custom cakes</a>
+      <a href="#bakes">Recent bakes</a>
       <a href="#delivery">Delivery</a>
     </nav>
     <button class="cart-btn" id="cart-open" type="button">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       <span>Your order</span><b id="cart-count" aria-label="items">0</b>
     </button>
   </div>
@@ -45,31 +46,35 @@
   <section class="hero">
     <div class="wrap hero-grid">
       <div class="hero-copy">
-        <p class="eyebrow">Home bakery · Ahmedabad</p>
-        <h1>Treats for every occasion, <span>baked to order.</span></h1>
-        <p class="lede">Customised cakes, cupcakes, cheesecakes, eggless tiramisu, sourdough and more, baked fresh at home and delivered across Ahmedabad. Pick your treats here and your order goes to us on WhatsApp.</p>
+        <p class="script">Homemade in Ahmedabad</p>
+        <h1>Treats for every occasion, <em>baked to order.</em></h1>
+        <p class="lede">Customised cakes, cupcakes, cheesecakes, eggless tiramisu, sourdough and more, baked fresh by Heli and delivered across Ahmedabad. Choose your treats here and your order goes straight to us on WhatsApp.</p>
         <div class="hero-cta">
           <a class="btn primary" href="#menu">See the menu</a>
           <a class="btn ghost" href="#custom">Design a custom cake</a>
         </div>
         <ul class="hero-facts">
-          <li>Delivery across Ahmedabad</li>
-          <li id="fact-lead">Order a day ahead</li>
-          <li id="fact-egg">Confirmed on WhatsApp</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.4-7 11-7 11Z" fill="currentColor"/></svg>Delivery across Ahmedabad</li>
+          <li id="fact-lead"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Order a day ahead</span></li>
+          <li id="fact-egg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Confirmed on WhatsApp</span></li>
         </ul>
       </div>
-      <figure class="hero-art">
-        <div id="palette" class="palette"></div>
-        <figcaption class="hand" id="palette-cap" aria-live="polite">Tap a colour to start a cake in that flavour</figcaption>
-      </figure>
+      <div class="hero-art">
+        <span class="arch-frame" aria-hidden="true"></span>
+        <figure class="arch arch-main"><img src="assets/img/gallery/lotus-biscoff.jpg" alt="Chocolate Lotus Biscoff cake with a caramel drip and gold pearls" width="538" height="760" fetchpriority="high"></figure>
+        <figure class="arch arch-side"><img src="assets/img/gallery/floral-birthday.jpg" alt="White buttercream birthday cake with piped orange roses" width="538" height="760" loading="lazy"></figure>
+        <img class="seal" src="assets/img/logo.png" alt="The Pastry Palette by Heli logo" width="124" height="124">
+        <p class="script tag">made with love</p>
+      </div>
     </div>
   </section>
 
   <section class="menu" id="menu" aria-labelledby="menu-title">
     <div class="wrap">
       <div class="sec-head">
-        <h2 id="menu-title">The menu</h2>
-        <p>Everything is baked when you order it. Choose a size, add it to your order, then send the order to us on WhatsApp.</p>
+        <p class="eyebrow">Our menu</p>
+        <h2 id="menu-title">Baked fresh, just for you</h2>
+        <p>Everything is baked after you order it. Pick a size, add it to your order, and send the order to us on WhatsApp.</p>
       </div>
     </div>
     <div class="chip-bar" id="chip-bar">
@@ -92,7 +97,7 @@
       <div class="builder">
         <p class="eyebrow">Cake designer</p>
         <h2 id="custom-title">Paint your own cake</h2>
-        <p class="sub">Pick a flavour, a size and the occasion, and tell us your theme. We'll reply on WhatsApp with the design and the final price.</p>
+        <p class="sub">Pick a flavour, a size and the occasion, and tell us your theme. We'll reply on WhatsApp with the design and the final price. Send us reference photos there too.</p>
         <form id="builder" novalidate>
           <fieldset>
             <legend>Occasion</legend>
@@ -124,9 +129,30 @@
     </div>
   </section>
 
+  <section class="bakes" id="bakes" aria-labelledby="bakes-title">
+    <div class="wrap">
+      <div class="sec-head center">
+        <p class="eyebrow">From Heli's kitchen</p>
+        <h2 id="bakes-title">Recent bakes</h2>
+        <div class="divider" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.6-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.4-7 11-7 11Z" fill="currentColor"/></svg></div>
+        <p>A few of the cakes we've made lately. Every one is designed for the person it's for.</p>
+      </div>
+      <div class="bake-grid">
+        <a class="bake" href="https://www.instagram.com/p/DeRIdPzJpNP/" target="_blank" rel="noopener"><img src="assets/img/gallery/rainbow-4.jpg" alt="Pastel rainbow birthday cake with a gold number 4" loading="lazy" width="538" height="760"><span>Pastel rainbow birthday</span></a>
+        <a class="bake" href="https://www.instagram.com/p/DeVwfpbIbuN/" target="_blank" rel="noopener"><img src="assets/img/gallery/number-1.jpg" alt="Vanilla first-birthday cake with pastel balls and a gold 1" loading="lazy" width="538" height="760"><span>First birthday</span></a>
+        <a class="bake" href="https://www.instagram.com/p/DeMh8KRpF2-/" target="_blank" rel="noopener"><img src="assets/img/gallery/lotus-biscoff.jpg" alt="Chocolate Lotus Biscoff cake with a caramel drip" loading="lazy" width="538" height="760"><span>Chocolate Lotus Biscoff</span></a>
+        <a class="bake" href="https://www.instagram.com/p/DbYO4p6CLau/" target="_blank" rel="noopener"><img src="assets/img/gallery/lemon-blueberry.jpg" alt="Lemon blueberry buttercream cake with rosemary" loading="lazy" width="538" height="760"><span>Lemon blueberry buttercream</span></a>
+        <a class="bake" href="https://www.instagram.com/p/DZelBkip4i7/" target="_blank" rel="noopener"><img src="assets/img/gallery/bon-voyage.jpg" alt="Sky-blue bon voyage cake with a plane and flags" loading="lazy" width="538" height="760"><span>Bon voyage</span></a>
+        <a class="bake" href="https://www.instagram.com/p/DcRCByxIh8_/" target="_blank" rel="noopener"><img src="assets/img/gallery/floral-birthday.jpg" alt="Buttercream birthday cake with piped roses and a butterfly" loading="lazy" width="538" height="760"><span>Buttercream florals</span></a>
+      </div>
+      <div class="follow"><a class="btn ghost" id="insta-link" href="https://www.instagram.com/thepastry_palette/" target="_blank" rel="noopener">Follow @thepastry_palette</a></div>
+    </div>
+  </section>
+
   <section class="how" aria-labelledby="how-title">
     <div class="wrap">
       <h2 id="how-title">How ordering works</h2>
+      <div class="divider" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.6-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.4-7 11-7 11Z" fill="currentColor"/></svg></div>
       <ol class="steps-list">
         <li><b>Pick your treats</b><span>Choose sizes and add them to your order, or design a custom cake.</span></li>
         <li><b>Add delivery details</b><span>Your name, an Ahmedabad address and the date you need it.</span></li>
@@ -153,22 +179,12 @@
       </form>
     </div>
   </section>
-
-  <section class="insta" aria-labelledby="insta-title">
-    <div class="wrap insta-row">
-      <div>
-        <h2 id="insta-title">Fresh from the oven, every week</h2>
-        <p>See our latest cakes, bakes and hampers on Instagram.</p>
-      </div>
-      <a class="btn light" id="insta-link" href="https://www.instagram.com/thepastry_palette/" target="_blank" rel="noopener">Follow @thepastry_palette</a>
-    </div>
-  </section>
 </main>
 
 <footer class="site-foot">
   <div class="wrap foot-grid">
-    <div>
-      <p class="foot-brand">The Pastry Palette</p>
+    <div class="foot-brand">
+      <img src="assets/img/logo.png" alt="The Pastry Palette by Heli logo" width="84" height="84" loading="lazy">
       <p class="foot-sub">A home bakery in Ahmedabad by Heli. Customised cakes, cupcakes, cheesecakes and desserts for every occasion.</p>
     </div>
     <div>

@@ -1,8 +1,8 @@
 // Hand-drawn style SVG illustrations, used when a product has no photo yet,
-// plus the painter's-palette hero and the cake in the cake designer.
+// plus the cake in the cake designer.
 // Background, plate and shadow colours come from CSS tokens so they follow light/dark mode.
 
-import { shade, rng, luminance, esc } from "./util.js";
+import { shade, rng, luminance } from "./util.js";
 
 export const ART_TYPES = [
   ["cake", "Cake"],
@@ -189,54 +189,6 @@ export function artSVG(type, tint, seed, top) {
   const t = tint || "#b9773f";
   const draw = DRAW[type] || DRAW.cake;
   return frame(t, draw(t, rng(seed || type), top));
-}
-
-/* ───────────── hero: the painter's palette, loaded with frosting ───────────── */
-
-const PALETTE_PATH =
-  "M146 52 C 250 6 418 18 488 104 C 548 178 528 286 446 336 C 364 384 236 378 176 338 C 146 318 148 290 172 278 C 204 262 214 232 188 218 C 158 202 120 236 92 220 C 30 186 40 100 146 52 Z M106 150 a 24 24 0 1 0 48 0 a 24 24 0 1 0 -48 0 Z";
-
-const DOLLOP_SPOTS = [[232, 92], [326, 68], [418, 104], [470, 186], [446, 270], [370, 322], [278, 330], [214, 278]];
-
-function rosette(x, y, c, r = 30) {
-  let s = `<circle cx="${x + 4}" cy="${y + 6}" r="${r + 2}" fill="var(--art-shadow)"/>`;
-  for (let i = 0; i < 9; i++) {
-    const a = (i / 9) * Math.PI * 2;
-    s += `<circle cx="${n(x + (r - 8) * Math.cos(a))}" cy="${n(y + (r - 8) * Math.sin(a))}" r="10" fill="${c}"/>`;
-  }
-  s += `<circle cx="${x}" cy="${y}" r="${r - 6}" fill="${c}"/>`;
-  s += `<path d="M${x} ${y} m-16 0 a16 16 0 0 1 16 -16 a12 12 0 0 1 12 12 a8 8 0 0 1 -8 8 a4 4 0 0 1 -4 -4" fill="none" stroke="${shade(c, luminance(c) > 0.7 ? -0.14 : 0.24)}" stroke-width="3.2" stroke-linecap="round"/>`;
-  s += `<ellipse cx="${x - 9}" cy="${y - 11}" rx="6" ry="3.5" fill="#fff" opacity=".5" transform="rotate(-30 ${x - 9} ${y - 11})"/>`;
-  return s;
-}
-
-export function paletteSVG(flavours) {
-  const list = (flavours || []).slice(0, DOLLOP_SPOTS.length);
-  let grain = "";
-  for (let i = 0; i < 7; i++) {
-    const y = 80 + i * 40;
-    grain += `<path d="M${60 + i * 6} ${y} C 200 ${y - 30} 330 ${y + 30} ${520 - i * 8} ${y - 10}" stroke="var(--wood-grain)" stroke-width="2" fill="none" opacity=".55"/>`;
-  }
-  let dollops = "";
-  list.forEach((f, i) => {
-    const [x, y] = DOLLOP_SPOTS[i];
-    dollops += `<g class="dollop" data-i="${i}" tabindex="0" role="button" aria-label="${esc(f.name)}: design a cake in this flavour" style="--d:${i * 70}ms;transform-origin:${x}px ${y}px">${rosette(x, y, f.color || "#b9773f")}</g>`;
-  });
-  const smear = list[1]?.color || "#b9773f";
-  return `<svg class="palette-svg" viewBox="0 0 560 400" role="group" aria-label="Flavour palette">
-<defs><clipPath id="pal-clip"><path d="${PALETTE_PATH}" clip-rule="evenodd"/></clipPath></defs>
-<path d="${PALETTE_PATH}" fill="var(--art-shadow)" fill-rule="evenodd" transform="translate(8 12)"/>
-<path d="${PALETTE_PATH}" fill="var(--wood)" fill-rule="evenodd"/>
-<g clip-path="url(#pal-clip)">${grain}</g>
-<path d="${PALETTE_PATH}" fill="none" stroke="var(--wood-edge)" stroke-width="3" fill-rule="evenodd"/>
-<g transform="translate(336 206) rotate(-26)">
-  <rect x="-96" y="-10" width="52" height="20" rx="10" fill="#6b4330"/>
-  <rect x="-48" y="-7" width="16" height="14" rx="2" fill="#c7cbd0"/>
-  <path d="M-34 -5 L58 -14 Q82 -14 82 0 Q82 14 58 14 L-34 5 Z" fill="var(--steel)" stroke="var(--steel-edge)" stroke-width="1.5"/>
-  <ellipse cx="60" cy="1" rx="18" ry="9" fill="${smear}"/>
-</g>
-${dollops}
-</svg>`;
 }
 
 /* ───────────── cake designer: side view, up to three tiers ───────────── */

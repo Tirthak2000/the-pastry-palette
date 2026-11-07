@@ -105,7 +105,21 @@ $("#login-form").addEventListener("submit", async (e) => {
   }
   btn.disabled = false; btn.textContent = "Sign in";
 });
+$("#toggle-pass").addEventListener("click", (e) => {
+  const input = $("#login-pass"), show = input.type === "password";
+  input.type = show ? "text" : "password";
+  e.currentTarget.textContent = show ? "Hide" : "Show";
+  e.currentTarget.setAttribute("aria-pressed", String(show));
+});
 for (const id of ["#sign-out", "#noadmin-out"]) $(id).addEventListener("click", () => admin.signOut());
+
+// A product photo that can't load shows its illustration instead.
+document.addEventListener("error", (e) => {
+  const img = e.target;
+  if (img.tagName !== "IMG" || !img.closest(".p-thumb")) return;
+  const p = P.find((x) => x.id === img.closest(".p-row")?.dataset.id);
+  if (p) img.outerHTML = artSVG(p.art, p.tint, p.id, p.top);
+}, true);
 $("#copy-uid").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText($("#noadmin-uid").textContent); toast("UID copied"); } catch (e) { toast("Select the UID and copy it."); }
 });
