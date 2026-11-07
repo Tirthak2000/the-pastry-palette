@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pastry Palette Admin</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#fff7f2">
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Vadodara:wght@400;500;600;700&family=Kalam:wght@400;700&family=Shrikhand&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/admin.css">
+<script type="module" src="assets/js/admin.js"></script>
+</head>
+<body class="admin">
+
+<header class="a-head">
+  <div class="wrap a-head-row">
+    <a class="brand" href="./" aria-label="Open the shop">
+      <svg class="brand-mark" viewBox="0 0 64 52" aria-hidden="true"><path d="M18 5C34-2 56 2 61 17c4 12-2 25-15 30-12 4-27 4-34-2-3-3-2-7 2-8 5-2 6-6 2-8-4-2-8 2-12 0C-3 24 0 11 18 5Zm-4 17a4 4 0 1 0 8 0a4 4 0 1 0-8 0Z" fill="var(--wood)" fill-rule="evenodd"/><circle cx="31" cy="12" r="5.5" fill="#b9773f"/><circle cx="46" cy="16" r="5.5" fill="var(--accent)"/><circle cx="50" cy="31" r="5.5" fill="#aebf7d"/><circle cx="37" cy="39" r="5.5" fill="#efe09a"/></svg>
+      <span class="brand-text"><small>the</small><b>Pastry Palette</b><i>shop admin</i></span>
+    </a>
+    <span class="mode-chip" id="mode-chip">Loading…</span>
+    <a class="btn small ghost" href="./" target="_blank" rel="noopener">View shop</a>
+    <button class="btn small ghost" type="button" id="sign-out" hidden>Sign out</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="demo-note" id="demo-note" hidden>
+    <b>Demo mode.</b> Firebase isn't connected yet, so changes are saved in this browser only and customers won't see them. Follow the README to connect Firebase; then every change here goes live on the website.
+  </div>
+</div>
+
+<main class="wrap a-main">
+  <p class="loading" id="loading">Loading the shop…</p>
+
+  <section class="auth-card" id="login" hidden aria-labelledby="login-title">
+    <h1 id="login-title">Sign in to manage the shop</h1>
+    <form id="login-form" novalidate>
+      <div class="field">
+        <label for="login-user">Username</label>
+        <input id="login-user" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+      </div>
+      <div class="field">
+        <label for="login-pass">Password</label>
+        <input id="login-pass" type="password" autocomplete="current-password" required>
+      </div>
+      <p class="form-err" id="login-err" role="alert" hidden></p>
+      <button class="btn primary wide" type="submit" id="login-btn">Sign in</button>
+    </form>
+  </section>
+
+  <section class="auth-card" id="noadmin" hidden aria-labelledby="noadmin-title">
+    <h1 id="noadmin-title">This account can't edit the shop yet</h1>
+    <p>You're signed in as <b id="noadmin-email"></b>, but this account isn't on the admin list.</p>
+    <p>In Firebase → Firestore, create a document in the <code>admins</code> collection whose ID is this account's UID:</p>
+    <p class="uid-row"><code id="noadmin-uid"></code> <button class="btn small ghost" type="button" id="copy-uid">Copy UID</button></p>
+    <button class="btn ghost" type="button" id="noadmin-out">Sign out</button>
+  </section>
+
+  <div id="panel" hidden>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Admin sections">
+      <button role="tab" type="button" id="t-products" aria-controls="tab-products" aria-selected="true">Products</button>
+      <button role="tab" type="button" id="t-categories" aria-controls="tab-categories" aria-selected="false">Categories</button>
+      <button role="tab" type="button" id="t-orders" aria-controls="tab-orders" aria-selected="false">Orders &amp; delivery</button>
+      <button role="tab" type="button" id="t-cake" aria-controls="tab-cake" aria-selected="false">Cake designer</button>
+      <button role="tab" type="button" id="t-shop" aria-controls="tab-shop" aria-selected="false">Shop details</button>
+      <button role="tab" type="button" id="t-backup" aria-controls="tab-backup" aria-selected="false">Backup</button>
+    </nav>
+
+    <!-- PRODUCTS -->
+    <section class="tab" id="tab-products" role="tabpanel" aria-labelledby="t-products">
+      <div class="first-run" id="first-run" hidden>
+        <div><b>Your shop is empty.</b> Load the starter menu (13 products and default settings) and then edit it.</div>
+        <button class="btn primary" type="button" id="seed-btn">Load starter menu</button>
+      </div>
+      <div class="toolbar">
+        <div class="field search"><label class="sr" for="p-search">Search products</label><input id="p-search" type="search" placeholder="Search products"></div>
+        <div class="field"><label class="sr" for="p-cat">Category</label><select id="p-cat"></select></div>
+        <button class="btn ghost" type="button" id="bulk-open">Change prices</button>
+        <button class="btn primary" type="button" id="add-product">Add product</button>
+      </div>
+      <p class="summary" id="p-summary"></p>
+      <div id="p-list" class="p-list"></div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <section class="tab" id="tab-categories" role="tabpanel" aria-labelledby="t-categories" hidden>
+      <div class="panel-card">
+        <h2>Categories</h2>
+        <p class="help">Categories are the headings on the menu, shown in this order. A category with products in it can't be deleted until its products are moved or deleted.</p>
+        <div id="c-list" class="c-list"></div>
+        <form class="add-row" id="c-add" novalidate>
+          <div class="field"><label for="c-new">New category</label><input id="c-new" placeholder="e.g. Brownies" maxlength="40"></div>
+          <button class="btn primary" type="submit">Add category</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ORDERS & DELIVERY -->
+    <section class="tab" id="tab-orders" role="tabpanel" aria-labelledby="t-orders" hidden>
+      <form class="panel-card settings" id="f-orders" novalidate>
+        <h2>Orders</h2>
+        <label class="switch-row"><input type="checkbox" id="s-accepting"><span class="switch" aria-hidden="true"></span><span><b>Accepting orders</b><small>Turn off when you're on a break. Customers can still browse, but can't send orders.</small></span></label>
+        <div class="field"><label for="s-paused">Message shown while orders are off</label><textarea id="s-paused" rows="2" maxlength="240"></textarea></div>
+        <div class="field"><label for="s-announce">Announcement bar <span class="opt">leave empty to hide</span></label><input id="s-announce" maxlength="120" placeholder="Diwali hampers are open, order by 1 Nov"></div>
+        <label class="switch-row"><input type="checkbox" id="s-eggless"><span class="switch" aria-hidden="true"></span><span><b>Everything is eggless</b><small>Shows "100% eggless" at the top of the site instead of per-product badges.</small></span></label>
+        <div class="grid-2">
+          <div class="field"><label for="s-lead">Earliest delivery (days from today)</label><input id="s-lead" type="number" min="0" max="30" step="1"></div>
+          <div class="field"><label for="s-min">Minimum order (₹) <span class="opt">0 = none</span></label><input id="s-min" type="number" min="0" step="10"></div>
+        </div>
+
+        <h2>Delivery</h2>
+        <fieldset class="radio-set">
+          <legend>Delivery charge</legend>
+          <label><input type="radio" name="s-mode" value="distance"> By distance, confirmed on WhatsApp</label>
+          <label><input type="radio" name="s-mode" value="flat"> Flat fee</label>
+          <label><input type="radio" name="s-mode" value="free"> Always free</label>
+        </fieldset>
+        <div class="grid-2" id="flat-fields">
+          <div class="field"><label for="s-fee">Flat delivery fee (₹)</label><input id="s-fee" type="number" min="0" step="10"></div>
+          <div class="field"><label for="s-free">Free delivery on orders from (₹) <span class="opt">0 = never</span></label><input id="s-free" type="number" min="0" step="50"></div>
+        </div>
+        <div class="field"><label for="s-slots">Delivery time slots <span class="opt">one per line</span></label><textarea id="s-slots" rows="4"></textarea></div>
+        <div class="field"><label for="s-note">Delivery note</label><input id="s-note" maxlength="160"></div>
+        <div class="field"><label for="s-pins">Extra Ahmedabad pincodes <span class="opt">all 380xxx pincodes are already accepted</span></label><textarea id="s-pins" rows="3" spellcheck="false"></textarea><small class="hint">Separate with commas or spaces. Orders from any other pincode are blocked with a message to contact you on WhatsApp.</small></div>
+        <div class="save-bar"><span class="dirty" hidden>Unsaved changes</span><button class="btn primary" type="submit">Save changes</button></div>
+      </form>
+    </section>
+
+    <!-- CAKE DESIGNER -->
+    <section class="tab" id="tab-cake" role="tabpanel" aria-labelledby="t-cake" hidden>
+      <form class="panel-card settings" id="f-cake" novalidate>
+        <h2>Cake designer</h2>
+        <p class="help">The "Paint your own cake" section and the flavour palette at the top of the site. The estimate a customer sees is the flavour's price per kg × the size.</p>
+        <label class="switch-row"><input type="checkbox" id="s-cake-on"><span class="switch" aria-hidden="true"></span><span><b>Show the cake designer</b><small>Turn off to hide it from the site.</small></span></label>
+        <h3>Flavours</h3>
+        <p class="help">The first eight appear on the palette at the top of the site.</p>
+        <div id="fl-list" class="rows"></div>
+        <button class="btn small ghost" type="button" id="fl-add">Add flavour</button>
+        <h3>Sizes</h3>
+        <div id="sz-list" class="rows"></div>
+        <button class="btn small ghost" type="button" id="sz-add">Add size</button>
+        <div class="field"><label for="s-occasions">Occasions <span class="opt">one per line</span></label><textarea id="s-occasions" rows="5"></textarea></div>
+        <div class="field"><label for="s-cake-note">Note under the designer</label><textarea id="s-cake-note" rows="2" maxlength="240"></textarea></div>
+        <div class="save-bar"><span class="dirty" hidden>Unsaved changes</span><button class="btn primary" type="submit">Save changes</button></div>
+      </form>
+    </section>
+
+    <!-- SHOP DETAILS -->
+    <section class="tab" id="tab-shop" role="tabpanel" aria-labelledby="t-shop" hidden>
+      <form class="panel-card settings" id="f-shop" novalidate>
+        <h2>Shop details</h2>
+        <div class="field"><label for="s-name">Shop name</label><input id="s-name" maxlength="60"></div>
+        <div class="grid-2">
+          <div class="field"><label for="s-wa">WhatsApp number for orders</label><input id="s-wa" inputmode="tel" placeholder="918460282977"><small class="hint">Country code and number, digits only. Orders are sent here.</small></div>
+          <div class="field"><label for="s-phone">Phone number as shown on the site</label><input id="s-phone" placeholder="+91 84602 82977"></div>
+        </div>
+        <div class="field"><label for="s-insta">Instagram username</label><input id="s-insta" placeholder="thepastry_palette" spellcheck="false"></div>
+        <div class="save-bar"><span class="dirty" hidden>Unsaved changes</span><button class="btn primary" type="submit">Save changes</button></div>
+      </form>
+    </section>
+
+    <!-- BACKUP -->
+    <section class="tab" id="tab-backup" role="tabpanel" aria-labelledby="t-backup" hidden>
+      <div class="panel-card">
+        <h2>Download a backup</h2>
+        <p class="help">Saves every product (with photos) and all settings in one file. Keep a copy after big changes.</p>
+        <div class="btn-row"><button class="btn primary" type="button" id="bk-download">Download backup</button><button class="btn ghost" type="button" id="bk-copy">Copy backup text</button></div>
+      </div>
+      <div class="panel-card">
+        <h2>Restore from a backup</h2>
+        <p class="help">Replaces all products and settings with the ones in the backup file.</p>
+        <div class="field"><label for="bk-file">Backup file (.json)</label><input id="bk-file" type="file" accept="application/json,.json"></div>
+        <div id="bk-preview"></div>
+      </div>
+      <div class="panel-card">
+        <h2>Start over with the starter menu</h2>
+        <p class="help">Replaces all products and settings with the 13 starter products and default settings.</p>
+        <div id="reset-zone"><button class="btn ghost danger" type="button" id="reset-btn">Replace with starter menu</button></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- PRODUCT EDITOR -->
+<dialog class="modal" id="editor" aria-labelledby="ed-title">
+  <form id="ed-form" novalidate>
+    <header class="modal-head"><h2 id="ed-title">Edit product</h2><button class="icon-btn" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></header>
+    <div class="modal-body">
+      <div class="ed-media">
+        <div class="ed-preview" id="ed-preview"></div>
+        <div class="ed-media-ctl">
+          <div class="btn-row">
+            <label class="btn small primary file-btn">Upload photo<input id="ed-file" type="file" accept="image/*"></label>
+            <button class="btn small ghost" type="button" id="ed-remove-photo">Remove photo</button>
+          </div>
+          <small class="hint" id="ed-photo-hint">Square or landscape photos work best. They're resized and compressed before saving.</small>
+          <div class="grid-2" id="ed-art-fields">
+            <div class="field"><label for="ed-art">Illustration</label><select id="ed-art"></select></div>
+            <div class="field"><label for="ed-tint">Colour</label><input id="ed-tint" type="color"></div>
+          </div>
+        </div>
+      </div>
+      <div class="field"><label for="ed-name">Name</label><input id="ed-name" maxlength="70" required></div>
+      <div class="grid-2">
+        <div class="field"><label for="ed-cat">Category</label><select id="ed-cat"></select></div>
+        <div class="field"><label for="ed-kind">Type</label><select id="ed-kind"><option value="">Regular item</option><option value="custom">Custom cake (opens the cake designer)</option></select></div>
+      </div>
+      <div class="field"><label for="ed-desc">Description</label><textarea id="ed-desc" rows="3" maxlength="240"></textarea></div>
+      <div id="ed-opts-wrap">
+        <p class="label">Sizes and prices</p>
+        <div id="ed-opts" class="rows"></div>
+        <button class="btn small ghost" type="button" id="ed-opt-add">Add a size</button>
+        <small class="hint">Leave a price empty to show "Price on request".</small>
+      </div>
+      <div class="field"><label for="ed-note">Short note <span class="opt">shown in handwriting, e.g. "Order 1 day ahead"</span></label><input id="ed-note" maxlength="60"></div>
+      <div class="checks">
+        <label class="switch-row"><input type="checkbox" id="ed-show"><span class="switch" aria-hidden="true"></span><span><b>Show on website</b></span></label>
+        <label class="switch-row"><input type="checkbox" id="ed-sold"><span class="switch" aria-hidden="true"></span><span><b>Sold out</b></span></label>
+        <label class="switch-row"><input type="checkbox" id="ed-best"><span class="switch" aria-hidden="true"></span><span><b>Bestseller badge</b></span></label>
+        <label class="switch-row"><input type="checkbox" id="ed-egg"><span class="switch" aria-hidden="true"></span><span><b>Eggless badge</b></span></label>
+      </div>
+      <p class="form-err" id="ed-err" role="alert" hidden></p>
+    </div>
+    <footer class="modal-foot">
+      <div id="ed-delete-zone"></div>
+      <div class="btn-row"><button class="btn ghost" type="button" data-close>Cancel</button><button class="btn primary" type="submit" id="ed-save">Save product</button></div>
+    </footer>
+  </form>
+</dialog>
+
+<!-- BULK PRICES -->
+<dialog class="modal" id="bulk" aria-labelledby="bulk-title">
+  <form id="bulk-form" novalidate>
+    <header class="modal-head"><h2 id="bulk-title">Change prices</h2><button class="icon-btn" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></header>
+    <div class="modal-body">
+      <div class="grid-2">
+        <div class="field"><label for="bk-scope">Products</label><select id="bk-scope"></select></div>
+        <div class="field"><label for="bk-dir">Change</label><select id="bk-dir"><option value="1">Increase</option><option value="-1">Decrease</option></select></div>
+        <div class="field"><label for="bk-amt">By</label><input id="bk-amt" type="number" min="0" step="1" value="10"></div>
+        <div class="field"><label for="bk-unit">Unit</label><select id="bk-unit"><option value="pct">percent (%)</option><option value="inr">rupees (₹)</option></select></div>
+        <div class="field"><label for="bk-round">Round to the nearest</label><select id="bk-round"><option value="1">₹1</option><option value="5">₹5</option><option value="10" selected>₹10</option><option value="50">₹50</option></select></div>
+      </div>
+      <p class="label">Preview</p>
+      <div class="preview-table" id="bk-table"></div>
+    </div>
+    <footer class="modal-foot"><span class="summary" id="bk-sum"></span><div class="btn-row"><button class="btn ghost" type="button" data-close>Cancel</button><button class="btn primary" type="submit">Apply new prices</button></div></footer>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

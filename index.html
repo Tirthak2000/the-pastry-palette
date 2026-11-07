@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Pastry Palette</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="The Pastry Palette by Heli: customised cakes, cupcakes, cheesecakes, eggless tiramisu, sourdough and more, baked to order and delivered across Ahmedabad. Order on WhatsApp.">
+<meta name="theme-color" content="#fff7f2">
+<meta property="og:type" content="website">
+<meta property="og:title" content="The Pastry Palette · Cakes & bakes in Ahmedabad">
+<meta property="og:description" content="Customised cakes, cupcakes, cheesecakes and desserts, baked to order and delivered across Ahmedabad. Order on WhatsApp.">
+<meta property="og:image" content="assets/img/og-image.jpg">
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Vadodara:wght@400;500;600;700&family=Kalam:wght@400;700&family=Shrikhand&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="module" src="assets/js/main.js"></script>
+</head>
+<body>
+
+<div class="announce" id="announce" hidden><div class="wrap"><p id="announce-text"></p></div></div>
+
+<header class="site-head">
+  <div class="wrap head-row">
+    <a class="brand" href="#top" aria-label="The Pastry Palette, back to top">
+      <svg class="brand-mark" viewBox="0 0 64 52" aria-hidden="true"><path d="M18 5C34-2 56 2 61 17c4 12-2 25-15 30-12 4-27 4-34-2-3-3-2-7 2-8 5-2 6-6 2-8-4-2-8 2-12 0C-3 24 0 11 18 5Zm-4 17a4 4 0 1 0 8 0a4 4 0 1 0-8 0Z" fill="var(--wood)" fill-rule="evenodd"/><circle cx="31" cy="12" r="5.5" fill="#b9773f"/><circle cx="46" cy="16" r="5.5" fill="var(--accent)"/><circle cx="50" cy="31" r="5.5" fill="#aebf7d"/><circle cx="37" cy="39" r="5.5" fill="#efe09a"/></svg>
+      <span class="brand-text"><small>the</small><b>Pastry Palette</b><i>by Heli</i></span>
+    </a>
+    <nav class="head-nav" aria-label="Sections">
+      <a href="#menu">Menu</a>
+      <a href="#custom">Custom cakes</a>
+      <a href="#delivery">Delivery</a>
+    </nav>
+    <button class="cart-btn" id="cart-open" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Your order</span><b id="cart-count" aria-label="items">0</b>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Home bakery · Ahmedabad</p>
+        <h1>Treats for every occasion, <span>baked to order.</span></h1>
+        <p class="lede">Customised cakes, cupcakes, cheesecakes, eggless tiramisu, sourdough and more, baked fresh at home and delivered across Ahmedabad. Pick your treats here and your order goes to us on WhatsApp.</p>
+        <div class="hero-cta">
+          <a class="btn primary" href="#menu">See the menu</a>
+          <a class="btn ghost" href="#custom">Design a custom cake</a>
+        </div>
+        <ul class="hero-facts">
+          <li>Delivery across Ahmedabad</li>
+          <li id="fact-lead">Order a day ahead</li>
+          <li id="fact-egg">Confirmed on WhatsApp</li>
+        </ul>
+      </div>
+      <figure class="hero-art">
+        <div id="palette" class="palette"></div>
+        <figcaption class="hand" id="palette-cap" aria-live="polite">Tap a colour to start a cake in that flavour</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="menu" id="menu" aria-labelledby="menu-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 id="menu-title">The menu</h2>
+        <p>Everything is baked when you order it. Choose a size, add it to your order, then send the order to us on WhatsApp.</p>
+      </div>
+    </div>
+    <div class="chip-bar" id="chip-bar">
+      <div class="wrap"><nav class="chips" id="chips" aria-label="Menu categories"></nav></div>
+    </div>
+    <div class="wrap">
+      <div class="notice" id="paused" hidden></div>
+      <div id="menu-body" class="menu-body" aria-busy="true">
+        <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="custom" id="custom" aria-labelledby="custom-title">
+    <div class="wrap custom-grid">
+      <div class="stage" id="stage">
+        <div id="cake-art"></div>
+        <ul class="stage-tags" id="stage-tags"></ul>
+      </div>
+      <div class="builder">
+        <p class="eyebrow">Cake designer</p>
+        <h2 id="custom-title">Paint your own cake</h2>
+        <p class="sub">Pick a flavour, a size and the occasion, and tell us your theme. We'll reply on WhatsApp with the design and the final price.</p>
+        <form id="builder" novalidate>
+          <fieldset>
+            <legend>Occasion</legend>
+            <div class="pills" id="b-occasion"></div>
+          </fieldset>
+          <fieldset>
+            <legend>Flavour</legend>
+            <div class="swatches" id="b-flavour"></div>
+          </fieldset>
+          <fieldset>
+            <legend>Size</legend>
+            <div class="pills" id="b-size"></div>
+          </fieldset>
+          <div class="field">
+            <label for="b-theme">Theme or design idea</label>
+            <textarea id="b-theme" rows="3" maxlength="400" placeholder="e.g. Pastel rainbow with a gold number 4 topper"></textarea>
+          </div>
+          <div class="field">
+            <label for="b-message">Message on the cake <span class="opt">optional</span></label>
+            <input id="b-message" type="text" maxlength="32" placeholder="Happy Birthday Riya" autocomplete="off">
+          </div>
+          <div class="builder-foot">
+            <p class="estimate" id="b-estimate"></p>
+            <button class="btn primary" type="submit" id="b-add">Add cake to order</button>
+          </div>
+          <p class="fine" id="b-note"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="how" aria-labelledby="how-title">
+    <div class="wrap">
+      <h2 id="how-title">How ordering works</h2>
+      <ol class="steps-list">
+        <li><b>Pick your treats</b><span>Choose sizes and add them to your order, or design a custom cake.</span></li>
+        <li><b>Add delivery details</b><span>Your name, an Ahmedabad address and the date you need it.</span></li>
+        <li><b>Send it on WhatsApp</b><span>Your order opens in WhatsApp, written out and ready to send.</span></li>
+        <li><b>We confirm and bake</b><span>We reply with the total, delivery charge and payment details, then bake it fresh.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="delivery" id="delivery" aria-labelledby="delivery-title">
+    <div class="wrap delivery-grid">
+      <div>
+        <p class="eyebrow">Delivery</p>
+        <h2 id="delivery-title">Delivered across Ahmedabad</h2>
+        <ul class="facts" id="delivery-facts"></ul>
+      </div>
+      <form class="pin-card" id="pin-form" novalidate>
+        <label for="pin-input">Check your pincode</label>
+        <div class="pin-row">
+          <input id="pin-input" inputmode="numeric" maxlength="6" placeholder="380015" autocomplete="postal-code">
+          <button class="btn primary" type="submit">Check</button>
+        </div>
+        <p class="pin-result" id="pin-result" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
+  <section class="insta" aria-labelledby="insta-title">
+    <div class="wrap insta-row">
+      <div>
+        <h2 id="insta-title">Fresh from the oven, every week</h2>
+        <p>See our latest cakes, bakes and hampers on Instagram.</p>
+      </div>
+      <a class="btn light" id="insta-link" href="https://www.instagram.com/thepastry_palette/" target="_blank" rel="noopener">Follow @thepastry_palette</a>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap foot-grid">
+    <div>
+      <p class="foot-brand">The Pastry Palette</p>
+      <p class="foot-sub">A home bakery in Ahmedabad by Heli. Customised cakes, cupcakes, cheesecakes and desserts for every occasion.</p>
+    </div>
+    <div>
+      <h3>Order</h3>
+      <ul>
+        <li><a href="#menu">Menu</a></li>
+        <li><a href="#custom">Custom cakes</a></li>
+        <li><a href="#delivery">Delivery areas</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Reach us</h3>
+      <ul>
+        <li><a id="foot-wa" href="https://wa.me/918460282977" target="_blank" rel="noopener">WhatsApp</a></li>
+        <li><a id="foot-call" href="tel:+918460282977"><span id="foot-phone">+91 84602 82977</span></a></li>
+        <li><a id="foot-insta" href="https://www.instagram.com/thepastry_palette/" target="_blank" rel="noopener">Instagram</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap foot-note"><span>© <span id="year">2026</span> The Pastry Palette</span><a id="admin-link" href="admin.html" hidden>Shop admin (demo)</a><span>Delivery within Ahmedabad only</span></div>
+</footer>
+
+<div class="cart-bar" id="cart-bar" hidden>
+  <button type="button" id="cart-bar-btn"><span id="cart-bar-text"></span><b>View order</b></button>
+</div>
+
+<a class="wa-float" id="wa-float" href="https://wa.me/918460282977" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">
+  <svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3Zm0 23.6c-2 0-4-.5-5.7-1.6l-.4-.2-3.9 1 1-3.8-.3-.4A10.6 10.6 0 1 1 16 26.6Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2l-1 1.2c-.2.2-.4.2-.7.1a8.7 8.7 0 0 1-4.3-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.5l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.3 1.4 3.5c.2.2 2.4 3.7 5.9 5.2 2.2.9 3 1 4.1.8.7-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4Z"/></svg>
+</a>
+
+<dialog class="sheet" id="sheet" aria-labelledby="sheet-title">
+  <div class="sheet-inner">
+    <header class="sheet-head">
+      <div>
+        <h2 id="sheet-title">Your order</h2>
+        <ol class="sheet-steps" id="sheet-steps"><li class="on">Order</li><li>Delivery details</li><li>Send</li></ol>
+      </div>
+      <button class="icon-btn" type="button" id="sheet-close" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </header>
+
+    <div class="sheet-body" id="view-cart"></div>
+
+    <form class="sheet-body" id="view-details" novalidate hidden>
+      <div class="form-grid">
+        <div class="field">
+          <label for="co-name">Your name</label>
+          <input id="co-name" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="co-phone">Phone (WhatsApp)</label>
+          <input id="co-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="98765 43210" required>
+        </div>
+        <div class="field">
+          <label for="co-date">Delivery date</label>
+          <input id="co-date" type="date" required>
+        </div>
+        <div class="field">
+          <label for="co-slot">Delivery time</label>
+          <select id="co-slot" required></select>
+        </div>
+        <div class="field wide">
+          <label for="co-house">House / flat no. and building</label>
+          <input id="co-house" autocomplete="address-line1" placeholder="B-402, Shivalik Heights" required>
+        </div>
+        <div class="field wide">
+          <label for="co-street">Street, society and area</label>
+          <input id="co-street" autocomplete="address-line2" placeholder="Satellite Road, Satellite" required>
+        </div>
+        <div class="field">
+          <label for="co-landmark">Landmark <span class="opt">optional</span></label>
+          <input id="co-landmark" placeholder="Near Star Bazaar">
+        </div>
+        <div class="field">
+          <label for="co-pin">Pincode</label>
+          <input id="co-pin" inputmode="numeric" maxlength="6" autocomplete="postal-code" placeholder="380015" required>
+        </div>
+        <div class="field">
+          <label for="co-city">City</label>
+          <input id="co-city" value="Ahmedabad" readonly aria-describedby="co-city-hint">
+          <small class="hint" id="co-city-hint">We deliver within Ahmedabad only.</small>
+        </div>
+        <div class="field">
+          <label for="co-map">Google Maps location <span class="opt">optional</span></label>
+          <div class="map-row">
+            <input id="co-map" type="url" placeholder="Paste a Maps link">
+            <button class="btn small ghost" type="button" id="co-locate">Use my location</button>
+          </div>
+        </div>
+        <div class="field wide">
+          <label for="co-cakemsg">Message on cake or gift card <span class="opt">optional</span></label>
+          <input id="co-cakemsg" maxlength="60" placeholder="Happy Anniversary, Mom & Dad">
+        </div>
+        <div class="field wide">
+          <label for="co-notes">Notes for us <span class="opt">optional</span></label>
+          <textarea id="co-notes" rows="2" maxlength="400" placeholder="Less sweet, cupcake flavours, gate code, anything else"></textarea>
+        </div>
+      </div>
+    </form>
+
+    <div class="sheet-body" id="view-sent" hidden></div>
+
+    <footer class="sheet-foot" id="foot-cart">
+      <dl class="totals" id="totals"></dl>
+      <p class="foot-msg" id="foot-msg" hidden></p>
+      <button class="btn primary wide" type="button" id="to-details">Add delivery details</button>
+    </footer>
+    <footer class="sheet-foot" id="foot-details" hidden>
+      <p class="foot-msg err" id="details-error" hidden></p>
+      <div class="foot-row">
+        <button class="btn ghost" type="button" id="back-cart">Back</button>
+        <a class="btn wa wide" id="send-wa" href="https://wa.me/918460282977" target="_blank" rel="noopener">
+          <svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3Zm0 23.6c-2 0-4-.5-5.7-1.6l-.4-.2-3.9 1 1-3.8-.3-.4A10.6 10.6 0 1 1 16 26.6Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2l-1 1.2c-.2.2-.4.2-.7.1a8.7 8.7 0 0 1-4.3-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.5l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.3 1.4 3.5c.2.2 2.4 3.7 5.9 5.2 2.2.9 3 1 4.1.8.7-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4Z"/></svg>
+          Send order on WhatsApp
+        </a>
+      </div>
+    </footer>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

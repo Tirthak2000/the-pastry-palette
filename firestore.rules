@@ -1,0 +1,35 @@
+rules_version = '2';
+
+// The Pastry Palette
+// Anyone can read the menu and shop settings (the website needs them).
+// Only accounts listed in the `admins` collection can change anything.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 120;
+      allow delete: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin() && docId == 'site';
+    }
+
+    // Admins are added by hand in the Firebase console, never from the website.
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+  }
+}
