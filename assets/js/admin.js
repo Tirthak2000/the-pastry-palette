@@ -53,7 +53,7 @@ async function loadAll() {
   const d = await admin.load();
   S = d.settings;
   P = d.products;
-  $("#first-run").hidden = !d.empty;
+  $("#first-run").hidden = P.length > 0;
   renderAll(true);
   show("#panel");
 }

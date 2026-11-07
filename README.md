@@ -141,8 +141,8 @@ shows the right one with a **Copy UID** button.
 
 Photos uploaded in the admin are compressed in the browser (about 100–230 KB each) and stored inside
 the product records, so Firebase Storage (paid) isn't needed. Each shop visit reads one record per
-product plus one for settings; the free plan allows 50,000 reads a day, about 3,500 visits a day with
-13 products.
+product plus one for settings; the free plan allows 50,000 reads a day, about 1,200 visits a day with
+39 products.
 
 ## Deploy on Vercel
 
