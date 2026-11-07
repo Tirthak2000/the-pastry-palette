@@ -73,6 +73,28 @@ export function pincodeStatus(pin, delivery) {
   return extra.includes(p) ? "ok" : "outside";
 }
 
+// Coordinates from "23.0225, 72.5714" or a Google Maps link that contains them
+// (…/@23.02,72.57,17z · ?q=23.02,72.57 · !3d23.02!4d72.57). Short maps.app.goo.gl links don't.
+export function parseLatLng(text) {
+  const s = String(text || "");
+  const m =
+    s.match(/^\s*(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)\s*$/) ||
+    s.match(/@(-?\d{1,2}\.\d+),\s*(-?\d{1,3}\.\d+)/) ||
+    s.match(/[?&](?:q|query|ll|destination|center)=(-?\d{1,2}\.\d+)(?:,|%2C)\s*(-?\d{1,3}\.\d+)/i) ||
+    s.match(/!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)/);
+  if (!m) return null;
+  const lat = Number(m[1]), lng = Number(m[2]);
+  return Math.abs(lat) <= 90 && Math.abs(lng) <= 180 ? { lat, lng } : null;
+}
+
+// Straight-line distance in km between two { lat, lng } points.
+export function distanceKm(a, b) {
+  const r = (d) => (d * Math.PI) / 180;
+  const dLat = r(b.lat - a.lat), dLng = r(b.lng - a.lng);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(r(a.lat)) * Math.cos(r(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(h));
+}
+
 // Local date helpers (yyyy-mm-dd in the visitor's own time zone).
 export function isoDate(d) {
   const z = (n) => String(n).padStart(2, "0");

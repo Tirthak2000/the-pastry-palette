@@ -118,20 +118,30 @@
           <div class="field"><label for="s-min">Minimum order (₹) <span class="opt">0 = none</span></label><input id="s-min" type="number" min="0" step="10"></div>
         </div>
 
+        <h2>Pickup</h2>
+        <label class="switch-row"><input type="checkbox" id="s-pickup"><span class="switch" aria-hidden="true"></span><span><b>Offer pickup</b><small>Customers collect their order from your kitchen.</small></span></label>
+        <div class="field"><label for="s-pickup-where">Pickup place shown on the site</label><input id="s-pickup-where" maxlength="80" placeholder="our home kitchen in Ahmedabad"><small class="hint">Shown as "Pickup from …". Share the exact address on WhatsApp.</small></div>
+        <div class="field"><label for="s-pickup-note">Pickup note</label><textarea id="s-pickup-note" rows="2" maxlength="240"></textarea></div>
+
         <h2>Delivery</h2>
+        <label class="switch-row"><input type="checkbox" id="s-deliver"><span class="switch" aria-hidden="true"></span><span><b>Offer delivery nearby</b><small>Customers within the distance below can ask for delivery.</small></span></label>
+        <div class="grid-2">
+          <div class="field"><label for="s-radius">Deliver within (km)</label><input id="s-radius" type="number" min="0.2" max="30" step="0.1"></div>
+          <div class="field"><label for="s-base">Kitchen location <span class="opt">for the distance check</span></label><input id="s-base" placeholder="23.0225, 72.5714" spellcheck="false"><small class="hint" id="s-base-hint">In Google Maps, right-click your kitchen and click the numbers at the top to copy them, then paste here. Leave empty to skip the check.</small></div>
+        </div>
         <fieldset class="radio-set">
-          <legend>Delivery charge</legend>
-          <label><input type="radio" name="s-mode" value="distance"> By distance, confirmed on WhatsApp</label>
+          <legend>Delivery charge within that distance</legend>
+          <label><input type="radio" name="s-mode" value="free"> Free</label>
           <label><input type="radio" name="s-mode" value="flat"> Flat fee</label>
-          <label><input type="radio" name="s-mode" value="free"> Always free</label>
+          <label><input type="radio" name="s-mode" value="distance"> Confirmed on WhatsApp</label>
         </fieldset>
         <div class="grid-2" id="flat-fields">
           <div class="field"><label for="s-fee">Flat delivery fee (₹)</label><input id="s-fee" type="number" min="0" step="10"></div>
           <div class="field"><label for="s-free">Free delivery on orders from (₹) <span class="opt">0 = never</span></label><input id="s-free" type="number" min="0" step="50"></div>
         </div>
-        <div class="field"><label for="s-slots">Delivery time slots <span class="opt">one per line</span></label><textarea id="s-slots" rows="4"></textarea></div>
-        <div class="field"><label for="s-note">Delivery note</label><input id="s-note" maxlength="160"></div>
-        <div class="field"><label for="s-pins">Extra Ahmedabad pincodes <span class="opt">all 380xxx pincodes are already accepted</span></label><textarea id="s-pins" rows="3" spellcheck="false"></textarea><small class="hint">Separate with commas or spaces. Orders from any other pincode are blocked with a message to contact you on WhatsApp.</small></div>
+        <div class="field"><label for="s-slots">Pickup and delivery time slots <span class="opt">one per line</span></label><textarea id="s-slots" rows="4"></textarea></div>
+        <div class="field"><label for="s-note">Extra note <span class="opt">optional, shown under pickup &amp; delivery</span></label><input id="s-note" maxlength="160"></div>
+        <div class="field"><label for="s-pins">Extra Ahmedabad pincodes for delivery addresses <span class="opt">all 380xxx pincodes are already accepted</span></label><textarea id="s-pins" rows="3" spellcheck="false"></textarea><small class="hint">Separate with commas or spaces. Orders from any other pincode are blocked with a message to contact you on WhatsApp.</small></div>
         <div class="save-bar"><span class="dirty" hidden>Unsaved changes</span><button class="btn primary" type="submit">Save changes</button></div>
       </form>
     </section>

@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Pastry Palette</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="The Pastry Palette by Heli: customised cakes, cupcakes, cheesecakes, eggless tiramisu, sourdough and more, baked to order and delivered across Ahmedabad. Order on WhatsApp.">
+<meta name="description" content="The Pastry Palette by Heli: customised cakes, cupcakes, cheesecakes, eggless tiramisu, sourdough and more, baked to order in Ahmedabad. Pickup, or free delivery close by. Order on WhatsApp.">
 <meta name="theme-color" content="#fbf7ef">
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Pastry Palette by Heli · Cakes & bakes in Ahmedabad">
-<meta property="og:description" content="Customised cakes, cupcakes, cheesecakes and desserts, baked to order and delivered across Ahmedabad. Order on WhatsApp.">
+<meta property="og:description" content="Customised cakes, cupcakes, cheesecakes and desserts, baked to order in Ahmedabad. Pickup, or free delivery close by. Order on WhatsApp.">
 <meta property="og:image" content="assets/img/og-image.jpg">
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
@@ -33,7 +33,7 @@
       <a href="#menu">Menu</a>
       <a href="#custom">Custom cakes</a>
       <a href="#bakes">Recent bakes</a>
-      <a href="#delivery">Delivery</a>
+      <a href="#delivery">Pickup &amp; delivery</a>
     </nav>
     <button class="cart-btn" id="cart-open" type="button">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -48,13 +48,13 @@
       <div class="hero-copy">
         <p class="script">Homemade in Ahmedabad</p>
         <h1>Treats for every occasion, <em>baked to order.</em></h1>
-        <p class="lede">Customised cakes, cupcakes, cheesecakes, eggless tiramisu, sourdough and more, baked fresh by Heli and delivered across Ahmedabad. Choose your treats here and your order goes straight to us on WhatsApp.</p>
+        <p class="lede">Customised cakes, cupcakes, cheesecakes, eggless tiramisu, sourdough and more, baked fresh by Heli in Ahmedabad. Choose your treats here and your order goes straight to us on WhatsApp. Pick it up from our kitchen, or get free delivery if you live close by.</p>
         <div class="hero-cta">
           <a class="btn primary" href="#menu">See the menu</a>
           <a class="btn ghost" href="#custom">Design a custom cake</a>
         </div>
         <ul class="hero-facts">
-          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.4-7 11-7 11Z" fill="currentColor"/></svg>Delivery across Ahmedabad</li>
+          <li id="fact-where"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.4-7 11-7 11Z" fill="currentColor"/></svg><span>Pickup in Ahmedabad</span></li>
           <li id="fact-lead"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Order a day ahead</span></li>
           <li id="fact-egg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Confirmed on WhatsApp</span></li>
         </ul>
@@ -155,9 +155,9 @@
       <div class="divider" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.6-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.4-7 11-7 11Z" fill="currentColor"/></svg></div>
       <ol class="steps-list">
         <li><b>Pick your treats</b><span>Choose sizes and add them to your order, or design a custom cake.</span></li>
-        <li><b>Add delivery details</b><span>Your name, an Ahmedabad address and the date you need it.</span></li>
+        <li><b>Pickup or delivery</b><span>Collect it from our kitchen, or get free delivery if you live close by. Choose the date you need it.</span></li>
         <li><b>Send it on WhatsApp</b><span>Your order opens in WhatsApp, written out and ready to send.</span></li>
-        <li><b>We confirm and bake</b><span>We reply with the total, delivery charge and payment details, then bake it fresh.</span></li>
+        <li><b>We confirm and bake</b><span>We reply with the total, the pickup location and payment details, then bake it fresh.</span></li>
       </ol>
     </div>
   </section>
@@ -165,18 +165,24 @@
   <section class="delivery" id="delivery" aria-labelledby="delivery-title">
     <div class="wrap delivery-grid">
       <div>
-        <p class="eyebrow">Delivery</p>
-        <h2 id="delivery-title">Delivered across Ahmedabad</h2>
+        <p class="eyebrow">Pickup &amp; delivery</p>
+        <h2 id="delivery-title">Collect it, or we'll bring it over</h2>
         <ul class="facts" id="delivery-facts"></ul>
       </div>
-      <form class="pin-card" id="pin-form" novalidate>
-        <label for="pin-input">Check your pincode</label>
-        <div class="pin-row">
-          <input id="pin-input" inputmode="numeric" maxlength="6" placeholder="380015" autocomplete="postal-code">
-          <button class="btn primary" type="submit">Check</button>
+      <div class="pin-card fulfil-card" id="fulfil-card">
+        <div id="card-pickup">
+          <h3>Pickup</h3>
+          <p id="card-pickup-text"></p>
         </div>
-        <p class="pin-result" id="pin-result" aria-live="polite"></p>
-      </form>
+        <div id="card-delivery">
+          <h3 id="card-delivery-title">Free delivery nearby</h3>
+          <p id="card-delivery-text"></p>
+          <div class="near" id="near-check" hidden>
+            <button class="btn primary" type="button" id="near-btn">Check my distance</button>
+            <p class="pin-result" id="near-result" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 </main>
@@ -192,7 +198,7 @@
       <ul>
         <li><a href="#menu">Menu</a></li>
         <li><a href="#custom">Custom cakes</a></li>
-        <li><a href="#delivery">Delivery areas</a></li>
+        <li><a href="#delivery">Pickup &amp; delivery</a></li>
       </ul>
     </div>
     <div>
@@ -204,7 +210,7 @@
       </ul>
     </div>
   </div>
-  <div class="wrap foot-note"><span>© <span id="year">2026</span> The Pastry Palette</span><a id="admin-link" href="admin.html" hidden>Shop admin (demo)</a><span>Delivery within Ahmedabad only</span></div>
+  <div class="wrap foot-note"><span>© <span id="year">2026</span> The Pastry Palette</span><a id="admin-link" href="admin.html" hidden>Shop admin (demo)</a><span id="foot-where">Pickup in Ahmedabad</span></div>
 </footer>
 
 <div class="cart-bar" id="cart-bar" hidden>
@@ -220,7 +226,7 @@
     <header class="sheet-head">
       <div>
         <h2 id="sheet-title">Your order</h2>
-        <ol class="sheet-steps" id="sheet-steps"><li class="on">Order</li><li>Delivery details</li><li>Send</li></ol>
+        <ol class="sheet-steps" id="sheet-steps"><li class="on">Order</li><li>Pickup or delivery</li><li>Send</li></ol>
       </div>
       <button class="icon-btn" type="button" id="sheet-close" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -230,6 +236,14 @@
     <div class="sheet-body" id="view-cart"></div>
 
     <form class="sheet-body" id="view-details" novalidate hidden>
+      <fieldset class="method" id="co-method">
+        <legend>How would you like it?</legend>
+        <div class="method-row">
+          <label id="m-pickup"><input type="radio" name="co-method" value="pickup"><b>Pickup</b><small id="m-pickup-text">From our kitchen · free</small></label>
+          <label id="m-delivery"><input type="radio" name="co-method" value="delivery"><b>Delivery</b><small id="m-delivery-text">Free within 1 km</small></label>
+        </div>
+      </fieldset>
+      <p class="info-box" id="pickup-info" hidden></p>
       <div class="form-grid">
         <div class="field">
           <label for="co-name">Your name</label>
@@ -240,39 +254,37 @@
           <input id="co-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="98765 43210" required>
         </div>
         <div class="field">
-          <label for="co-date">Delivery date</label>
+          <label for="co-date" id="co-date-label">Pickup date</label>
           <input id="co-date" type="date" required>
         </div>
         <div class="field">
-          <label for="co-slot">Delivery time</label>
+          <label for="co-slot" id="co-slot-label">Pickup time</label>
           <select id="co-slot" required></select>
         </div>
-        <div class="field wide">
-          <label for="co-house">House / flat no. and building</label>
-          <input id="co-house" autocomplete="address-line1" placeholder="B-402, Shivalik Heights" required>
-        </div>
-        <div class="field wide">
-          <label for="co-street">Street, society and area</label>
-          <input id="co-street" autocomplete="address-line2" placeholder="Satellite Road, Satellite" required>
-        </div>
-        <div class="field">
-          <label for="co-landmark">Landmark <span class="opt">optional</span></label>
-          <input id="co-landmark" placeholder="Near Star Bazaar">
-        </div>
-        <div class="field">
-          <label for="co-pin">Pincode</label>
-          <input id="co-pin" inputmode="numeric" maxlength="6" autocomplete="postal-code" placeholder="380015" required>
-        </div>
-        <div class="field">
-          <label for="co-city">City</label>
-          <input id="co-city" value="Ahmedabad" readonly aria-describedby="co-city-hint">
-          <small class="hint" id="co-city-hint">We deliver within Ahmedabad only.</small>
-        </div>
-        <div class="field">
-          <label for="co-map">Google Maps location <span class="opt">optional</span></label>
-          <div class="map-row">
-            <input id="co-map" type="url" placeholder="Paste a Maps link">
-            <button class="btn small ghost" type="button" id="co-locate">Use my location</button>
+        <div class="addr wide" id="addr-fields" hidden>
+          <div class="field wide">
+            <label for="co-house">House / flat no. and building</label>
+            <input id="co-house" autocomplete="address-line1" placeholder="B-402, Shivalik Heights" required>
+          </div>
+          <div class="field wide">
+            <label for="co-street">Street, society and area</label>
+            <input id="co-street" autocomplete="address-line2" placeholder="Satellite Road, Satellite" required>
+          </div>
+          <div class="field">
+            <label for="co-landmark">Landmark <span class="opt">optional</span></label>
+            <input id="co-landmark" placeholder="Near Star Bazaar">
+          </div>
+          <div class="field">
+            <label for="co-pin">Pincode</label>
+            <input id="co-pin" inputmode="numeric" maxlength="6" autocomplete="postal-code" placeholder="380015" required>
+          </div>
+          <div class="field wide">
+            <label for="co-map">Your location <span class="opt" id="co-map-opt">optional</span></label>
+            <div class="map-row">
+              <input id="co-map" type="url" placeholder="Paste a Google Maps link" aria-describedby="co-map-hint">
+              <button class="btn small ghost" type="button" id="co-locate">Use my location</button>
+            </div>
+            <small class="hint" id="co-map-hint">Helps us check you're within the free delivery distance.</small>
           </div>
         </div>
         <div class="field wide">

@@ -4,9 +4,11 @@ Website and admin panel for **The Pastry Palette by Heli**, a home bakery in Ahm
 ([@thepastry_palette](https://www.instagram.com/thepastry_palette/)).
 
 - **Shop** (`/`): menu grouped by category, size options, a cake designer, recent bakes from
-  Instagram, an order cart, and a checkout that collects the delivery address and sends the order to
-  **+91 84602 82977** on WhatsApp. Delivery is Ahmedabad only: every 380xxx pincode is accepted,
-  plus the extra pincodes listed in the admin panel; other pincodes are blocked.
+  Instagram, an order cart, and a checkout that sends the order to **+91 84602 82977** on WhatsApp.
+  Customers choose **pickup** from the kitchen or **free delivery within 1 km**, as on the Instagram
+  menu. Delivery addresses must be in Ahmedabad, and when the kitchen location is set in the admin,
+  addresses further than 1 km (by the customer's shared location) are turned away with a suggestion
+  to pick up instead.
 - **Admin** (`/admin`): add, edit and delete products, upload photos, change prices (one at a time or
   in bulk), mark items sold out or hidden, reorder, manage categories, delivery rules, the cake
   designer's flavours and sizes, shop details, and backups. Protected by a username and password.
@@ -180,6 +182,8 @@ settings empty, and deploy. The admin panel is at `/admin`.
 - **Eggless**: the tiramisu and unjunk biscuits carry the "Eggless" badge. If everything is eggless,
   turn on Admin → Orders & delivery → **Everything is eggless**.
 - **Cake designer**: flavours match the signature cakes. Add a price per kg to show customers an estimate.
-- **Delivery**: the Instagram menu says pickup only, with free delivery within 1 km. The website is set
-  up for delivery across Ahmedabad, charged by distance and confirmed on WhatsApp. Change it in
-  Admin → Orders & delivery if that's not right.
+- **Pickup & delivery** (Admin → Orders & delivery), set up as on the Instagram menu: pickup from
+  "our home kitchen in Ahmedabad", plus free delivery within 1 km. Paste the kitchen's coordinates
+  into **Kitchen location** (in Google Maps, right-click the kitchen and click the numbers to copy them)
+  so the site can check a customer's distance. Without it, orders still go through and you check the
+  distance on WhatsApp. The exact pickup address is never shown on the site.

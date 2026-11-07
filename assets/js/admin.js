@@ -4,7 +4,7 @@
 
 import { admin, isLive, sortProducts, mergeSettings, STARTER_PRODUCTS, DEFAULT_SETTINGS } from "./data.js";
 import { placeholderHTML, ART_TYPES } from "./art.js";
-import { esc, inr, hasPrice, clone, slug, uid, store } from "./util.js";
+import { esc, inr, hasPrice, clone, slug, uid, store, parseLatLng } from "./util.js";
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -582,14 +582,30 @@ function fillOrders() {
   $("#s-eggless").checked = Boolean(S.allEggless);
   $("#s-lead").value = d.leadDays ?? 1;
   $("#s-min").value = d.minOrder ?? 0;
-  $$('input[name="s-mode"]').forEach((r) => (r.checked = r.value === (d.mode || "distance")));
+  $("#s-pickup").checked = d.pickup !== false;
+  $("#s-pickup-where").value = d.pickupWhere || "";
+  $("#s-pickup-note").value = d.pickupNote || "";
+  $("#s-deliver").checked = d.deliver !== false;
+  $("#s-radius").value = d.radiusKm ?? 1;
+  $("#s-base").value = d.base || "";
+  showBase();
+  $$('input[name="s-mode"]').forEach((r) => (r.checked = r.value === (d.mode || "free")));
   $("#s-fee").value = d.flatFee ?? 0;
   $("#s-free").value = d.freeAbove ?? 0;
   $("#s-slots").value = (d.slots || []).join("\n");
   $("#s-note").value = d.note || "";
   $("#s-pins").value = (d.extraPincodes || []).join(", ");
-  $("#flat-fields").hidden = (d.mode || "distance") !== "flat";
+  $("#flat-fields").hidden = (d.mode || "free") !== "flat";
 }
+
+function showBase() {
+  const raw = $("#s-base").value.trim(), hint = $("#s-base-hint");
+  const at = parseLatLng(raw);
+  if (!raw) hint.textContent = "In Google Maps, right-click your kitchen and click the numbers at the top to copy them, then paste here. Leave empty to skip the check.";
+  else if (at) hint.innerHTML = `Kitchen at ${at.lat.toFixed(5)}, ${at.lng.toFixed(5)}. <a href="https://www.google.com/maps?q=${at.lat},${at.lng}" target="_blank" rel="noopener">Check it on the map</a>`;
+  else hint.textContent = "These aren't coordinates. Paste numbers like 23.0225, 72.5714 (short maps.app.goo.gl links don't contain them).";
+}
+$("#s-base").addEventListener("input", showBase);
 
 let cakeDraft = null;
 function fillCake() {
@@ -667,13 +683,22 @@ $("#f-orders").addEventListener("submit", async (e) => {
     announcement: $("#s-announce").value.trim(),
     allEggless: $("#s-eggless").checked,
   });
+  const baseRaw = $("#s-base").value.trim(), at = parseLatLng(baseRaw);
+  if (baseRaw && !at) { toast("Kitchen location must be coordinates like 23.0225, 72.5714.", "err"); $("#s-base").focus(); return; }
+  if (!$("#s-pickup").checked && !$("#s-deliver").checked) { toast("Turn on pickup, delivery, or both.", "err"); return; }
   Object.assign(next.delivery, {
+    pickup: $("#s-pickup").checked,
+    pickupWhere: $("#s-pickup-where").value.trim() || DEFAULT_SETTINGS.delivery.pickupWhere,
+    pickupNote: $("#s-pickup-note").value.trim(),
+    deliver: $("#s-deliver").checked,
+    radiusKm: Math.min(30, Math.max(0.2, Math.round((Number($("#s-radius").value) || 1) * 10) / 10)),
+    base: at ? `${at.lat.toFixed(6)}, ${at.lng.toFixed(6)}` : "",
     leadDays: Math.min(30, num("#s-lead")), minOrder: num("#s-min"),
-    mode: $('input[name="s-mode"]:checked')?.value || "distance",
+    mode: $('input[name="s-mode"]:checked')?.value || "free",
     flatFee: num("#s-fee"), freeAbove: num("#s-free"),
     slots: lines($("#s-slots").value), note: $("#s-note").value.trim(), extraPincodes: pins,
   });
-  if (await run(() => admin.saveSettings(next), bad.length ? `Saved. Ignored ${bad.join(", ")} (not 6-digit pincodes).` : "Order and delivery settings saved")) {
+  if (await run(() => admin.saveSettings(next), bad.length ? `Saved. Ignored ${bad.join(", ")} (not 6-digit pincodes).` : "Pickup and delivery settings saved")) {
     S = next; fillOrders(); markDirty($("#f-orders"), false);
   }
 });

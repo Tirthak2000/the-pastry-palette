@@ -2,7 +2,7 @@
 
 import { loadShop, isLive, demoForget } from "./data.js";
 import { artSVG, cakeSVG, placeholderHTML, TIER_TOPS, CAKE_VIEWS } from "./art.js";
-import { esc, inr, hasPrice, shade, luminance, store, pincodeStatus, isoDate, addDays, niceDate, debounce, slug } from "./util.js";
+import { esc, inr, hasPrice, shade, luminance, store, pincodeStatus, isoDate, addDays, niceDate, debounce, slug, parseLatLng, distanceKm } from "./util.js";
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -77,14 +77,35 @@ function priced() {
   return { sub, unpriced };
 }
 
+/* ───────────── pickup / delivery ───────────── */
+const METHOD_KEY = "tpp-method-v1";
+let method = store.get(METHOD_KEY) || "pickup";
+const offers = () => ({ pickup: S.delivery?.pickup !== false, delivery: S.delivery?.deliver !== false });
+function currentMethod() {
+  const o = offers();
+  if (method === "delivery" && o.delivery) return "delivery";
+  if (o.pickup) return "pickup";
+  return "delivery";
+}
+const radius = () => Math.max(0.2, Number(S.delivery?.radiusKm) || 1);
+const kmText = (km) => (km < 1 ? `${Math.round((km * 1000) / 50) * 50} m` : `${Number(km.toFixed(1))} km`);
+const baseLoc = () => parseLatLng(S.delivery?.base);
+function deliveryCharge() {
+  const d = S.delivery || {};
+  if (d.mode === "flat") return { short: inr(d.flatFee), long: `Delivery for ${inr(d.flatFee)}` };
+  if (d.mode === "distance") return { short: "Charge confirmed on WhatsApp", long: "Delivery (charge confirmed on WhatsApp)" };
+  return { short: "Free", long: "Free delivery" };
+}
+
 function deliveryInfo(sub, unpriced) {
   const d = S.delivery || {};
-  if (d.mode === "free") return { text: "Free", fee: 0 };
+  if (currentMethod() === "pickup") return { label: "Pickup", text: "Free", fee: 0 };
   if (d.mode === "flat") {
     const free = Number(d.freeAbove) > 0 && sub >= Number(d.freeAbove) && !unpriced;
-    return free ? { text: "Free", fee: 0 } : { text: inr(d.flatFee), fee: Number(d.flatFee) || 0 };
+    return { label: "Delivery", text: free ? "Free" : inr(d.flatFee), fee: free ? 0 : Number(d.flatFee) || 0 };
   }
-  return { text: "By distance, confirmed on WhatsApp", fee: null };
+  if (d.mode === "distance") return { label: "Delivery", text: "Charge confirmed on WhatsApp", fee: null };
+  return { label: "Delivery", text: `Free within ${kmText(radius())}`, fee: 0 };
 }
 
 function updateCartUI() {
@@ -347,34 +368,59 @@ function addCustom(e) {
   toast("Custom cake added to your order", "View order", () => openSheet("cart"));
 }
 
-/* ───────────── delivery info + pincode check ───────────── */
-function renderDeliveryFacts() {
-  const d = S.delivery || {};
+/* ───────────── pickup & delivery info ───────────── */
+function renderFulfilment() {
+  const d = S.delivery || {}, o = offers(), r = kmText(radius()), lead = Number(d.leadDays) || 0;
+  const charge = deliveryCharge();
+  const where = esc(d.pickupWhere || "our kitchen");
   const facts = [];
-  const lead = Number(d.leadDays) || 0;
-  facts.push(lead > 0
-    ? `<b>Order at least ${lead} day${lead === 1 ? "" : "s"} ahead.</b> Custom and theme cakes need a little more time.`
+  facts.push(lead === 1
+    ? `<b>Order 24–48 hours ahead.</b> Every bake is made fresh for your order.`
+    : lead > 1 ? `<b>Order at least ${lead} days ahead.</b> Every bake is made fresh for your order.`
     : `<b>Same-day orders</b> when we have room. Custom cakes need a few days.`);
-  if (d.mode === "flat") facts.push(`<b>Delivery charge ${inr(d.flatFee)}</b>${Number(d.freeAbove) > 0 ? `, free on orders of ${inr(d.freeAbove)} or more.` : "."}`);
-  else if (d.mode === "free") facts.push(`<b>Free delivery</b> anywhere in Ahmedabad.`);
-  else facts.push(`<b>Delivery charge depends on distance.</b> We confirm it with your order on WhatsApp.`);
-  if ((d.slots || []).length) facts.push(`<b>Delivery slots:</b> ${d.slots.map(esc).join(", ")}.`);
+  if (o.pickup) facts.push(`<b>Pickup</b> from ${where}. We share the exact location on WhatsApp.`);
+  if (o.delivery) facts.push(`<b>${charge.long}</b> within ${r} of our kitchen.`);
+  if (o.pickup) facts.push(`<b>Live further away?</b> Book a Porter, Swiggy Genie or Rapido to collect it from us.`);
+  if ((d.slots || []).length) facts.push(`<b>Time slots:</b> ${d.slots.map(esc).join(", ")}.`);
   if (Number(d.minOrder) > 0) facts.push(`<b>Minimum order ${inr(d.minOrder)}.</b>`);
-  facts.push(`<b>Ahmedabad only.</b> ${esc(d.note || "We deliver within Ahmedabad city.")} All 380xxx pincodes and many 382xxx areas are covered.`);
+  if (d.note) facts.push(esc(d.note));
   $("#delivery-facts").innerHTML = facts.map((f) => `<li><span>${f}</span></li>`).join("");
-  $("#fact-lead span").textContent = lead > 0 ? `Order ${lead === 1 ? "a day" : lead + " days"} ahead` : "Same-day when we have room";
+
+  $("#card-pickup").hidden = !o.pickup;
+  $("#card-pickup-text").textContent = `From ${d.pickupWhere || "our kitchen"}. ${d.pickupNote || ""}`.trim();
+  $("#card-delivery").hidden = !o.delivery;
+  $("#card-delivery-title").textContent = d.mode === "free" || !d.mode ? "Free delivery nearby" : "Delivery nearby";
+  $("#card-delivery-text").textContent = `${charge.long} if you live within ${r} of our kitchen.${o.pickup ? " Further away? Choose pickup." : ""}`;
+  $("#near-check").hidden = !(o.delivery && baseLoc());
+
+  const short = o.pickup && o.delivery
+    ? `Pickup, or ${d.mode === "free" || !d.mode ? "free " : ""}delivery within ${r}`
+    : o.pickup ? "Pickup in Ahmedabad" : `Delivery within ${r}`;
+  $("#fact-where span").textContent = short;
+  $("#foot-where").textContent = o.delivery ? `Pickup in Ahmedabad · delivery within ${r}` : "Pickup in Ahmedabad";
+  $("#fact-lead span").textContent = lead === 1 ? "Order 24–48 hours ahead" : lead > 1 ? `Order ${lead} days ahead` : "Same-day when we have room";
   $("#fact-egg span").textContent = S.allEggless ? "100% eggless" : "Confirmed on WhatsApp";
 }
 
-function onPinCheck(e) {
-  e.preventDefault();
-  const pin = $("#pin-input").value.trim();
-  const out = $("#pin-result");
-  const st = pincodeStatus(pin, S.delivery);
-  out.className = "pin-result " + (st === "ok" ? "ok" : st === "outside" ? "no" : "");
-  if (st === "ok") out.textContent = `Yes, we deliver to ${pin}.`;
-  else if (st === "outside") out.innerHTML = `Sorry, ${esc(pin)} looks outside our Ahmedabad delivery area. If you're in Ahmedabad, <a href="${waLink(`Hi! Do you deliver to pincode ${pin}?`)}" target="_blank" rel="noopener">ask us on WhatsApp</a>.`;
-  else out.textContent = "Enter a 6-digit pincode.";
+function checkNear() {
+  const out = $("#near-result"), base = baseLoc();
+  if (!base) return;
+  const fail = (msg) => { out.className = "pin-result no"; out.textContent = msg; };
+  if (!navigator.geolocation) return fail("Your browser can't share your location. You can still order; we'll confirm on WhatsApp.");
+  out.className = "pin-result";
+  out.textContent = "Finding your location…";
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const km = distanceKm(base, { lat: pos.coords.latitude, lng: pos.coords.longitude });
+      const ok = km <= radius();
+      out.className = "pin-result " + (ok ? "ok" : "no");
+      out.textContent = ok
+        ? `You're about ${kmText(km)} from our kitchen, so delivery is available.`
+        : `You're about ${kmText(km)} away, outside our ${kmText(radius())} delivery range.${offers().pickup ? " Pickup is open to everyone." : ""}`;
+    },
+    () => fail("Couldn't get your location. You can still order; we'll confirm on WhatsApp."),
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
 }
 
 /* ───────────── order sheet ───────────── */
@@ -415,7 +461,8 @@ function renderCart() {
 function renderTotals() {
   const { sub, unpriced } = priced();
   const del = deliveryInfo(sub, unpriced);
-  let rows = `<dt>Items</dt><dd>${inr(sub)}${unpriced ? " +" : ""}</dd><dt>Delivery</dt><dd>${esc(del.text)}</dd>`;
+  let rows = `<dt>Items</dt><dd>${inr(sub)}${unpriced ? " +" : ""}</dd><dt>${del.label}</dt><dd>${esc(del.text)}</dd>`;
+  if (offers().pickup && offers().delivery) rows += `<dt style="grid-column:1/-1">Choose pickup or delivery in the next step</dt>`;
   if (unpriced) rows += `<dt style="grid-column:1/-1">${unpriced} item${unpriced === 1 ? "" : "s"} priced when we confirm your order</dt>`;
   const total = del.fee !== null && !unpriced ? sub + del.fee : null;
   rows += total !== null ? `<dt class="grand">Total</dt><dd class="grand">${inr(total)}</dd>` : `<dt class="grand">Estimated total</dt><dd class="grand">${inr(sub + (del.fee || 0))}${unpriced || del.fee === null ? " +" : ""}</dd>`;
@@ -459,7 +506,7 @@ function setView(v) {
   $("#view-details").hidden = v !== "details";
   $("#foot-details").hidden = v !== "details";
   $("#view-sent").hidden = v !== "sent";
-  $("#sheet-title").textContent = v === "details" ? "Delivery details" : v === "sent" ? "Almost done" : "Your order";
+  $("#sheet-title").textContent = v === "details" ? "Pickup or delivery" : v === "sent" ? "Almost done" : "Your order";
   $$("#sheet-steps li").forEach((li, i) => li.classList.toggle("on", i === ["cart", "details", "sent"].indexOf(v)));
   if (v === "cart") renderCart();
   if (v === "details") prepDetails();
@@ -494,6 +541,25 @@ function prepDetails() {
   for (const k of ["name", "phone", "house", "street", "landmark", "pin", "map"]) if (!field(k).value && saved[k]) field(k).value = saved[k];
   const hasCakeMsg = cart.custom.some((c) => c.message);
   field("cakemsg").closest(".field").hidden = hasCakeMsg;
+  const o = offers();
+  $("#co-method").hidden = !(o.pickup && o.delivery);
+  $("#m-pickup-text").textContent = "From our kitchen · free";
+  $("#m-delivery-text").textContent = `${deliveryCharge().short} · within ${kmText(radius())}`;
+  $$('input[name="co-method"]').forEach((r) => (r.checked = r.value === currentMethod()));
+  applyMethod();
+}
+
+function applyMethod() {
+  const m = currentMethod(), d = S.delivery || {};
+  $("#addr-fields").hidden = m !== "delivery";
+  const info = $("#pickup-info");
+  info.hidden = m !== "pickup";
+  info.textContent = `Pickup from ${d.pickupWhere || "our kitchen"}. ${d.pickupNote || ""}`.trim();
+  $("#co-date-label").textContent = m === "pickup" ? "Pickup date" : "Delivery date";
+  $("#co-slot-label").textContent = m === "pickup" ? "Pickup time" : "Delivery time";
+  $("#co-map-hint").textContent = baseLoc()
+    ? `Share your location so we can check you're within ${kmText(radius())}.`
+    : "Helps us find you quickly.";
 }
 
 const saveDetails = debounce(() => {
@@ -527,23 +593,35 @@ function mark(k, msg) {
 
 function readDetails() {
   const v = Object.fromEntries(F.map((k) => [k, field(k).value.trim()]));
+  const m = currentMethod();
   const errors = {};
+  let km = null;
   if (v.name.length < 2) errors.name = "Enter your name.";
   if (!normPhone(v.phone)) errors.phone = "Enter a 10-digit mobile number.";
   const min = isoDate(addDays(S.delivery?.leadDays));
-  if (!v.date) errors.date = "Choose a delivery date.";
-  else if (v.date < min) errors.date = `The earliest date we can deliver is ${niceDate(min)}.`;
-  if (!v.slot) errors.slot = "Choose a delivery time.";
-  if (v.house.length < 2) errors.house = "Enter your house or flat number and building.";
-  if (v.street.length < 3) errors.street = "Enter your street, society and area.";
-  const st = pincodeStatus(v.pin, S.delivery);
-  if (st === "invalid") errors.pin = "Enter a 6-digit pincode.";
-  if (st === "outside") errors.pin = "This pincode is outside our Ahmedabad delivery area. If you are in Ahmedabad, message us on WhatsApp.";
-  if (v.map && !/^https?:\/\//i.test(v.map)) errors.map = "Paste a full link starting with https://, or leave this empty.";
-  return { v, errors };
+  if (!v.date) errors.date = m === "pickup" ? "Choose a pickup date." : "Choose a delivery date.";
+  else if (v.date < min) errors.date = `The earliest date is ${niceDate(min)}.`;
+  if (!v.slot) errors.slot = "Choose a time.";
+  if (m === "delivery") {
+    if (v.house.length < 2) errors.house = "Enter your house or flat number and building.";
+    if (v.street.length < 3) errors.street = "Enter your street, society and area.";
+    const st = pincodeStatus(v.pin, S.delivery);
+    if (st === "invalid") errors.pin = "Enter a 6-digit pincode.";
+    if (st === "outside") errors.pin = "This pincode is outside Ahmedabad. Choose pickup instead, or message us on WhatsApp.";
+    if (v.map && !/^https?:\/\//i.test(v.map)) errors.map = "Paste a full link starting with https://, or leave this empty.";
+    const base = baseLoc(), here = parseLatLng(v.map);
+    if (base && here) {
+      km = distanceKm(base, here);
+      if (km > radius()) {
+        errors.map = `This location is about ${kmText(km)} from our kitchen and we deliver within ${kmText(radius())}.` +
+          (offers().pickup ? " Choose pickup instead; you can book a Porter or Swiggy Genie to collect it." : "");
+      }
+    }
+  }
+  return { v, errors, m, km };
 }
 
-function orderText(v) {
+function orderText(v, m = currentMethod(), km = null) {
   const L = [`*New order · ${S.shopName || "The Pastry Palette"}*`, ""];
   let i = 1;
   for (const l of cart.lines) {
@@ -560,12 +638,17 @@ function orderText(v) {
   const { sub, unpriced } = priced();
   const del = deliveryInfo(sub, unpriced);
   L.push("", `Items total: ${inr(sub)}${unpriced ? " + items priced on confirmation" : ""}`);
-  L.push(`Delivery: ${del.fee === null ? "by distance, please confirm" : del.text}`);
+  L.push(`${del.label}: ${del.fee === null ? "charge to confirm" : del.text}`);
   if (del.fee !== null && !unpriced) L.push(`*Total: ${inr(sub + del.fee)}*`);
-  L.push("", "*Deliver to*", `Name: ${v.name}`, `Phone: ${normPhone(v.phone)}`, `Date: ${niceDate(v.date)}, ${v.slot}`);
-  L.push(`Address: ${v.house}, ${v.street}, Ahmedabad ${v.pin}`);
-  if (v.landmark) L.push(`Landmark: ${v.landmark}`);
-  if (v.map) L.push(`Location: ${v.map}`);
+  if (m === "pickup") {
+    L.push("", "*Pickup*", `Name: ${v.name}`, `Phone: ${normPhone(v.phone)}`, `Pickup: ${niceDate(v.date)}, ${v.slot}`);
+  } else {
+    L.push("", "*Delivery*", `Name: ${v.name}`, `Phone: ${normPhone(v.phone)}`, `Delivery: ${niceDate(v.date)}, ${v.slot}`);
+    L.push(`Address: ${v.house}, ${v.street}, Ahmedabad ${v.pin}`);
+    if (v.landmark) L.push(`Landmark: ${v.landmark}`);
+    if (v.map) L.push(`Location: ${v.map}`);
+    if (km !== null) L.push(`Distance: about ${kmText(km)} from the kitchen`);
+  }
   if (v.cakemsg && !field("cakemsg").closest(".field").hidden) L.push(`Message on cake/card: ${v.cakemsg}`);
   if (v.notes) L.push(`Notes: ${v.notes}`);
   return L.join("\n");
@@ -573,22 +656,22 @@ function orderText(v) {
 
 let touched = false;
 function syncSendLink() {
-  const { v, errors } = readDetails();
+  const { v, errors, m, km } = readDetails();
   const ok = !Object.keys(errors).length;
   const a = $("#send-wa");
-  a.href = ok ? waLink(orderText(v)) : waBase();
+  a.href = ok ? waLink(orderText(v, m, km)) : waBase();
   a.setAttribute("aria-disabled", ok ? "false" : "true");
   if (touched) {
     for (const k of F) mark(k, errors[k]);
     $("#details-error").hidden = ok;
     $("#details-error").textContent = ok ? "" : "Fix the highlighted fields to send your order.";
   }
-  return { ok, v, errors };
+  return { ok, v, errors, m, km };
 }
 
 function onSend(e) {
   touched = true;
-  const { ok, v, errors } = syncSendLink();
+  const { ok, v, errors, m, km } = syncSendLink();
   if (!ok || !ordering() || !itemCount()) {
     e.preventDefault();
     const first = F.find((k) => errors[k]);
@@ -596,7 +679,7 @@ function onSend(e) {
     return;
   }
   // The link opens WhatsApp with the message written out. Show what was sent once it's on its way.
-  const text = orderText(v);
+  const text = orderText(v, m, km);
   setTimeout(() => showSent(text), 400);
 }
 
@@ -604,7 +687,7 @@ function showSent(text) {
   const box = $("#view-sent");
   box.innerHTML = `<div class="sent">
     <strong>Your order is ready in WhatsApp</strong>
-    <p>Tap <b>Send</b> in WhatsApp to place it. We'll reply to confirm the total, delivery time and payment.</p>
+    <p>Tap <b>Send</b> in WhatsApp to place it. We'll reply to confirm the total, the pickup location or delivery time, and payment.</p>
     <p class="fine">WhatsApp didn't open? Copy the message below and send it to ${esc(S.phoneDisplay || "+91 84602 82977")}.</p>
     <pre id="sent-text">${esc(text)}</pre>
     <div class="btn-row">
@@ -672,7 +755,7 @@ function renderAll() {
   applySettings();
   renderMenu();
   renderBuilder();
-  renderDeliveryFacts();
+  renderFulfilment();
   updateCartUI();
   if ($("#sheet").open && view === "cart") renderCart();
 }
@@ -713,7 +796,14 @@ $("#menu-body").addEventListener("click", onMenuClick);
 $("#builder").addEventListener("click", onBuilderClick);
 $("#builder").addEventListener("submit", addCustom);
 $("#b-message").addEventListener("input", () => updateCake());
-$("#pin-form").addEventListener("submit", onPinCheck);
+$("#near-btn").addEventListener("click", checkNear);
+$("#co-method").addEventListener("change", (e) => {
+  if (e.target.name !== "co-method") return;
+  method = e.target.value;
+  store.set(METHOD_KEY, method);
+  applyMethod();
+  syncSendLink();
+});
 $("#cart-open").addEventListener("click", () => openSheet("cart"));
 $("#cart-bar-btn").addEventListener("click", () => openSheet("cart"));
 $("#sheet-close").addEventListener("click", closeSheet);

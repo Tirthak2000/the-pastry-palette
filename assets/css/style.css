@@ -514,3 +514,25 @@ legend, .field label { font-weight: 500; font-size: 0.92rem; letter-spacing: 0.0
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+
+/* ───── pickup / delivery choice ───── */
+.method { display: grid; gap: 0.5rem; }
+.method legend { margin-bottom: 0.5rem; }
+.method-row { display: grid; gap: 0.6rem; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.method label {
+  position: relative; display: grid; gap: 0.1rem; padding: 0.8rem 1rem 0.8rem 2.7rem; border: 1px solid var(--line); border-radius: 14px;
+  background: var(--surface); cursor: pointer; font-weight: 400; margin: 0;
+}
+.method input { position: absolute; left: 1rem; top: 1.05rem; width: 18px; height: 18px; margin: 0; accent-color: var(--btn); }
+.method label:has(input:checked) { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.method b { font-weight: 500; font-size: 1rem; }
+.method small { color: var(--ink-2); font-size: 0.84rem; line-height: 1.35; }
+.info-box { padding: 0.8rem 1rem; border-radius: 12px; background: var(--paper); border: 1px solid var(--line); font-size: 0.9rem; color: var(--ink-2); }
+.addr { display: grid; gap: 0.9rem; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 480px) { .addr { grid-template-columns: repeat(2, minmax(0, 1fr)); } .addr .wide { grid-column: 1 / -1; } }
+.fulfil-card { gap: 1.1rem; }
+.fulfil-card > div { display: grid; gap: 0.4rem; position: relative; }
+.fulfil-card > div + div { padding-top: 1.1rem; border-top: 1px solid var(--line); }
+.fulfil-card h3 { font-family: var(--f-display); font-weight: 600; font-size: 1.5rem; line-height: 1.1; }
+.fulfil-card p { color: var(--ink-2); }
+.near { display: grid; gap: 0.5rem; justify-items: start; margin-top: 0.3rem; }

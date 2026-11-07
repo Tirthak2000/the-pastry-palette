@@ -40,14 +40,21 @@ export const DEFAULT_SETTINGS = {
     { id: "hampers", name: "Hampers" },
   ],
 
+  // From the Instagram menu notes: pickup only, with free delivery within 1 km.
   delivery: {
-    mode: "distance", // "distance" = charged by distance, confirmed on WhatsApp · "flat" · "free"
-    flatFee: 80,
-    freeAbove: 0, // 0 = no free-delivery threshold
+    pickup: true, // customers can collect from the kitchen
+    pickupWhere: "our home kitchen in Ahmedabad", // shown on the site; the exact address is shared on WhatsApp
+    pickupNote: "We share the exact pickup location on WhatsApp. Can't come yourself? Book a Porter, Swiggy Genie or Rapido pickup from our place.",
+    deliver: true, // nearby delivery
+    radiusKm: 1, // delivery only within this distance of the kitchen
+    base: "", // kitchen location "lat, lng" for the distance check; empty = we confirm on WhatsApp
+    mode: "free", // delivery charge within the radius: "free" · "flat" · "distance" (confirmed on WhatsApp)
+    flatFee: 50,
+    freeAbove: 0, // 0 = no free-delivery threshold (flat mode)
     minOrder: 0, // 0 = no minimum
-    leadDays: 1, // earliest delivery date = today + leadDays
+    leadDays: 1, // earliest date = today + leadDays
     slots: ["11 am – 2 pm", "2 pm – 5 pm", "5 pm – 8 pm", "8 pm – 10 pm"],
-    note: "We deliver within Ahmedabad city only.",
+    note: "",
     // Every 380xxx pincode is accepted automatically. Add other Ahmedabad pincodes here.
     extraPincodes: [
       "382330", "382340", "382345", "382346", "382350", "382405", "382415", "382418", "382424",
