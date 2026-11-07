@@ -9,12 +9,12 @@
 //     browser you are using, so customers will NOT see them.
 // ─────────────────────────────────────────────────────────────────────────────
 export const firebaseConfig = {
-  apiKey: "AIzaSyDy7nbZlC1dZHFO1GMkWlzK-S-EDloFrgU",
-  authDomain: "the-pastry-palette.firebaseapp.com",
-  projectId: "the-pastry-palette",
-  storageBucket: "the-pastry-palette.firebasestorage.app",
-  messagingSenderId: "1044646751260",
-  appId: "1:1044646751260:web:5ac4b773b92eda7b4903d9"
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: "",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

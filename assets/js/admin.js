@@ -3,7 +3,7 @@
 // categories, order and delivery settings, the cake designer, shop details and backups.
 
 import { admin, isLive, sortProducts, mergeSettings, STARTER_PRODUCTS, DEFAULT_SETTINGS } from "./data.js";
-import { artSVG, ART_TYPES } from "./art.js";
+import { placeholderHTML, ART_TYPES } from "./art.js";
 import { esc, inr, hasPrice, clone, slug, uid, store } from "./util.js";
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -118,7 +118,7 @@ document.addEventListener("error", (e) => {
   const img = e.target;
   if (img.tagName !== "IMG" || !img.closest(".p-thumb")) return;
   const p = P.find((x) => x.id === img.closest(".p-row")?.dataset.id);
-  if (p) img.outerHTML = artSVG(p.art, p.tint, p.id, p.top);
+  if (p) img.outerHTML = placeholderHTML(p.tint);
 }, true);
 $("#copy-uid").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText($("#noadmin-uid").textContent); toast("UID copied"); } catch (e) { toast("Select the UID and copy it."); }
@@ -147,7 +147,7 @@ $("#tabs").addEventListener("keydown", (e) => {
 
 /* ───────────── products ───────────── */
 const catName = (id) => S.categories.find((c) => c.id === id)?.name || "No category";
-const thumb = (p) => (p.image ? `<img src="${esc(p.image)}" alt="">` : artSVG(p.art, p.tint, p.id, p.top));
+const thumb = (p) => (p.image ? `<img src="${esc(p.image)}" alt="">` : placeholderHTML(p.tint));
 
 function renderCatFilter() {
   const sel = $("#p-cat"), cur = sel.value;
@@ -325,7 +325,7 @@ function openEditor(p) {
 }
 
 function renderEdPreview() {
-  $("#ed-preview").innerHTML = ed.image ? `<img src="${esc(ed.image)}" alt="Product photo">` : artSVG(ed.art, ed.tint, ed.id || "new", ed.top);
+  $("#ed-preview").innerHTML = ed.image ? `<img src="${esc(ed.image)}" alt="Product photo">` : placeholderHTML(ed.tint);
   $("#ed-art-fields").hidden = Boolean(ed.image);
   $("#ed-remove-photo").hidden = !ed.image;
 }

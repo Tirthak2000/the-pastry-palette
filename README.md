@@ -150,28 +150,36 @@ settings empty, and deploy. The admin panel is at `/admin`.
 ## Photos
 
 - `assets/img/logo.png` and everything in `assets/img/gallery/` come from
-  [@thepastry_palette](https://www.instagram.com/thepastry_palette/). Cakes with cartoon characters or
-  another business's logo were left out.
-- `assets/img/products/` are free stand-ins from Unsplash, used where the Instagram profile had no
-  usable photo. Replace each with a real photo from the admin panel (Edit → Upload photo):
+  [@thepastry_palette](https://www.instagram.com/thepastry_palette/): posts, and the Menu, Sourdough and
+  Unjunk cookies highlights. Cakes with cartoon characters or another business's logo were left out.
+- `assets/img/products/` are free stand-ins from Unsplash, used where Instagram had no usable photo.
+  Replace each with a real photo from the admin panel (Edit → Upload photo):
 
 | Product | Unsplash photo |
 | --- | --- |
+| Nutty Chocolate Salted Caramel | <https://unsplash.com/photos/L9bM17bEWfI> |
 | Whipped Caramel Chocolate Cake | <https://unsplash.com/photos/H2t7or5XgPs> |
-| Chocolate Truffle Cake | <https://unsplash.com/photos/L9bM17bEWfI> |
+| Lotus Biscoff Cheesecake | <https://unsplash.com/photos/P8Xn4jX_fVo> |
 | Blueberry Cheesecake | <https://unsplash.com/photos/LGNxQzYmeUk> |
-| Biscoff Cheesecake | <https://unsplash.com/photos/P8Xn4jX_fVo> |
-| Buttercream Cupcakes | <https://unsplash.com/photos/jxWL76TZQNw> |
-| Unjunk Cookies | <https://unsplash.com/photos/nKFObFgq0jA> |
-| Sourdough Loaf | <https://unsplash.com/photos/kU7TkW9FIJY> |
-| Celebration Hamper | <https://unsplash.com/photos/_f8S_o9xQK8> |
+| Cupcakes | <https://unsplash.com/photos/jxWL76TZQNw> |
+| Classic Chocolate Chunk Cookies | <https://unsplash.com/photos/nKFObFgq0jA> |
+| Signature Hamper | <https://unsplash.com/photos/_f8S_o9xQK8> |
 
-## Before going live: check these placeholders
+- Items with no photo at all show the logo on a soft background in the product's colour.
 
-- **Prices** in the starter menu are placeholders. Set the real ones in Admin → Products.
-- **Descriptions** were written from the Instagram posts; edit anything that isn't right.
-- **Eggless**: only the tiramisu carries the "Eggless" badge. If everything is eggless, turn on
-  Admin → Orders & delivery → **Everything is eggless**.
-- **Cake designer** flavours, prices per kg and sizes are examples (Admin → Cake designer).
-- **Delivery**: the charge is "by distance, confirmed on WhatsApp", earliest delivery is tomorrow,
-  and the 382xxx pincode list is a starting set. Review all three in Admin → Orders & delivery.
+## Before going live: check these
+
+- **Menu**: taken from the Instagram Menu highlight (signature cakes, cheesecakes, cake tubs, cupcakes,
+  cookies, brownies and teacakes, healthy treats), the Unjunk cookies, Sourdough and Hampers
+  highlights, and recent posts. Short descriptions were written from those; edit anything that isn't right.
+- **Prices are empty**, so every item shows "Price on request". Fill them in from Admin → Products
+  (type in the price boxes; each saves on its own). Sizes like "500 g / 1 kg", "Box" and "Tub" are
+  starting points: change them in Edit.
+- **Seasonal**: Mango Raspberry cake and Mango Tres Leches are hidden; switch "On website" on in season.
+- **Hampers** come from a festive hamper menu; keep them, hide them, or mark them sold out between festivals.
+- **Eggless**: the tiramisu and unjunk biscuits carry the "Eggless" badge. If everything is eggless,
+  turn on Admin → Orders & delivery → **Everything is eggless**.
+- **Cake designer**: flavours match the signature cakes. Add a price per kg to show customers an estimate.
+- **Delivery**: the Instagram menu says pickup only, with free delivery within 1 km. The website is set
+  up for delivery across Ahmedabad, charged by distance and confirmed on WhatsApp. Change it in
+  Admin → Orders & delivery if that's not right.

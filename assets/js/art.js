@@ -247,3 +247,9 @@ export const CAKE_VIEWS = [
   [24, 38, 312, 286],
   [0, -6, 360, 330],
 ];
+
+/* ───────────── items without a photo: the logo on a soft wash of the product's colour ───────────── */
+export function placeholderHTML(tint) {
+  const t = /^#[0-9a-f]{3,8}$/i.test(String(tint || "")) ? tint : "#b9773f";
+  return `<div class="ph" style="--t:${t}" aria-hidden="true"><img class="ph-logo" src="assets/img/logo.png" alt="" loading="lazy" decoding="async"></div>`;
+}

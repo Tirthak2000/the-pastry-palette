@@ -1,7 +1,7 @@
 // The Pastry Palette — shop page: menu, cake designer, order cart and WhatsApp checkout.
 
 import { loadShop, isLive, demoForget } from "./data.js";
-import { artSVG, cakeSVG, TIER_TOPS, CAKE_VIEWS } from "./art.js";
+import { artSVG, cakeSVG, placeholderHTML, TIER_TOPS, CAKE_VIEWS } from "./art.js";
 import { esc, inr, hasPrice, shade, luminance, store, pincodeStatus, isoDate, addDays, niceDate, debounce, slug } from "./util.js";
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -100,7 +100,7 @@ function updateCartUI() {
 
 /* ───────────── menu ───────────── */
 function media(p) {
-  const fallback = artSVG(p.art, p.tint, p.id, p.top);
+  const fallback = placeholderHTML(p.tint);
   return p.image ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" decoding="async" width="400" height="500" data-pid="${esc(p.id)}">` : fallback;
 }
 
@@ -235,7 +235,7 @@ document.addEventListener("error", (e) => {
   const img = e.target;
   if (img.tagName !== "IMG" || !img.dataset.pid) return;
   const p = byId.get(img.dataset.pid);
-  if (p) img.outerHTML = artSVG(p.art, p.tint, p.id, p.top);
+  if (p) img.outerHTML = placeholderHTML(p.tint);
 }, true);
 
 /* ───────────── cake designer ───────────── */
@@ -381,7 +381,7 @@ function onPinCheck(e) {
 let view = "cart";
 
 function lineThumb(p) {
-  return `<div class="line-thumb">${p.image ? `<img src="${esc(p.image)}" alt="" decoding="async" data-pid="${esc(p.id)}">` : artSVG(p.art, p.tint, p.id, p.top)}</div>`;
+  return `<div class="line-thumb">${p.image ? `<img src="${esc(p.image)}" alt="" decoding="async" data-pid="${esc(p.id)}">` : placeholderHTML(p.tint)}</div>`;
 }
 
 function renderCart() {
@@ -700,7 +700,7 @@ async function start() {
   // Demo mode: changes saved in /admin (another tab) show up here straight away.
   if (!isLive) {
     window.addEventListener("storage", async (e) => {
-      if (e.key !== "tpp-demo-v1") return;
+      if (e.key !== "tpp-demo-v2") return;
       demoForget();
       const data = await loadShop();
       S = data.settings; P = data.products;
